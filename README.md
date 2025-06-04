@@ -9,7 +9,8 @@ LegendAI helps generate AI-powered music compositions.
 
 ## Build & Run
 1. Open the project in Android Studio (Electric Eel or later).
-2. Allow Gradle to download dependencies.
+2. Allow Gradle to download dependencies. If the Gradle wrapper JAR is missing,
+   use a locally installed Gradle (`gradle assembleDebug`).
 3. Connect an Android device or start an emulator.
 4. Press **Run**.
 
