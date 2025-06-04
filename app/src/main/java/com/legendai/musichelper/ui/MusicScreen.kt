@@ -95,6 +95,12 @@ fun MusicScreen(viewModel: MusicViewModel, snackbarHostState: SnackbarHostState)
             stems?.let { result ->
                 StemPlayerSection(result)
                 Spacer(Modifier.height(8.dp))
+                Text(
+                    text = "Chord Progression: " +
+                        result.chord_progressions.joinToString(" | "),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Spacer(Modifier.height(8.dp))
                 Button(onClick = {
                     if (!permission.status.isGranted) {
                         permission.launchPermissionRequest()
