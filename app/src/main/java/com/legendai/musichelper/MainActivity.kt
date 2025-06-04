@@ -13,15 +13,18 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.legendai.musichelper.ui.MusicScreen
 import com.legendai.musichelper.ui.theme.LegendAITheme
 
+import dagger.hilt.android.AndroidEntryPoint
+
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            val viewModel: MusicViewModel = viewModel()
+            val viewModel: MusicViewModel = hiltViewModel()
             LegendAITheme {
                 val snackbarHostState = remember { SnackbarHostState() }
                 val error by viewModel.error.collectAsStateWithLifecycle()

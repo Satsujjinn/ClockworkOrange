@@ -5,13 +5,16 @@ import java.io.File
 import com.legendai.musichelper.util.AudioMixer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 // ViewModel handling business logic and exposing Compose states
-class MusicViewModel(
-    private val repository: MusicRepository = MusicRepository.create()
+@HiltViewModel
+class MusicViewModel @Inject constructor(
+    private val repository: MusicRepository
 ) : ViewModel() {
 
     private val _progress = MutableStateFlow(0f)
