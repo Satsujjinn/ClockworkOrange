@@ -10,7 +10,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.legendai.musichelper.ui.MusicScreen
+import com.legendai.musichelper.ui.HistoryScreen
 import com.legendai.musichelper.ui.theme.MusicGenTheme
 
 class MainActivity : ComponentActivity() {
@@ -21,10 +25,20 @@ class MainActivity : ComponentActivity() {
             MusicGenTheme {
                 val snackbarHostState = remember { SnackbarHostState() }
                 val error by viewModel.error.collectAsStateWithLifecycle()
+                val navController = rememberNavController()
                 LaunchedEffect(error) {
                     error?.let { snackbarHostState.showSnackbar(it) }
                 }
-                MusicScreen(viewModel, snackbarHostState)
+                NavHost(navController, startDestination = "main") {
+                    composable("main") {
+                        MusicScreen(viewModel, snackbarHostState) {
+                            navController.navigate("history")
+                        }
+                    }
+                    composable("history") {
+                        HistoryScreen(viewModel, navController)
+                    }
+                }
             }
         }
     }

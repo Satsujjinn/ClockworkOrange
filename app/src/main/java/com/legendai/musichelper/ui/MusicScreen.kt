@@ -3,6 +3,7 @@ package com.legendai.musichelper.ui
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.History
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
 import com.google.android.exoplayer2.ExoPlayer
@@ -20,7 +21,11 @@ import com.legendai.musichelper.MusicViewModel
 // Exporting to the app specific external directory does not require
 // runtime storage permission, so no permission APIs are needed here.
 @Composable
-fun MusicScreen(viewModel: MusicViewModel, snackbarHostState: SnackbarHostState) {
+fun MusicScreen(
+    viewModel: MusicViewModel,
+    snackbarHostState: SnackbarHostState,
+    onHistoryClick: () -> Unit
+) {
     val progress by viewModel.progress.collectAsState()
     val audio by viewModel.audio.collectAsState()
     val chords by viewModel.chords.collectAsState()
@@ -31,6 +36,16 @@ fun MusicScreen(viewModel: MusicViewModel, snackbarHostState: SnackbarHostState)
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = { Text("MusicGen Helper") },
+                actions = {
+                    IconButton(onClick = onHistoryClick) {
+                        Icon(Icons.Default.History, contentDescription = null)
+                    }
+                }
+            )
+        },
         containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
         Column(

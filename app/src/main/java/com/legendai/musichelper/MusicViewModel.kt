@@ -9,6 +9,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import com.legendai.musichelper.util.ChordGenerator
+import com.legendai.musichelper.TrackCache
+import com.legendai.musichelper.CachedTrack
 
 // ViewModel handling business logic and exposing Compose states
 class MusicViewModel(
@@ -35,6 +37,7 @@ class MusicViewModel(
                 val response = repository.generateSong(apiKey, request, context)
                 _audio.value = response
                 _chords.value = ChordGenerator.suggest(key, genre)
+                TrackCache.addTrack(context, CachedTrack(response.audioPath))
                 _progress.value = 1f
             } catch (e: Exception) {
                 _error.value = "Network error—please retry"
