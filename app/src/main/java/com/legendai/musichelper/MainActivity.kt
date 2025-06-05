@@ -15,7 +15,7 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.legendai.musichelper.ui.MusicScreen
-import com.legendai.musichelper.ui.theme.LegendAITheme
+import com.legendai.musichelper.ui.theme.MusicGenTheme
 
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -25,7 +25,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val viewModel: MusicViewModel = hiltViewModel()
-            LegendAITheme {
+            MusicGenTheme {
                 val snackbarHostState = remember { SnackbarHostState() }
                 val error by viewModel.error.collectAsStateWithLifecycle()
                 LaunchedEffect(error) {

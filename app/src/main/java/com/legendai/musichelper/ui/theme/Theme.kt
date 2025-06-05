@@ -38,7 +38,7 @@ private val DarkColors = darkColorScheme(
 private val LegendTypography = Typography(defaultFontFamily = FontFamily.Cursive)
 
 @Composable
-fun LegendAITheme(content: @Composable () -> Unit) {
+fun MusicGenTheme(content: @Composable () -> Unit) {
     val darkTheme = isSystemInDarkTheme()
     val colorScheme = if (darkTheme) DarkColors else LightColors
     MaterialTheme(colorScheme = colorScheme, typography = LegendTypography, content = content)
