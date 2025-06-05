@@ -8,6 +8,7 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 
 // Repository executing network calls with OkHttp
 class MusicRepository(private val client: OkHttpClient) {
@@ -18,7 +19,7 @@ class MusicRepository(private val client: OkHttpClient) {
         context: Context
     ): GenerateSongResponse {
         val json = Json.encodeToString(request)
-        val body = RequestBody.create("application/json".toMediaType(), json)
+        val body = json.toRequestBody("application/json".toMediaType())
         val httpRequest = Request.Builder()
             .url(Config.API_BASE_URL + "models/facebook/musicgen-small")
             .post(body)
