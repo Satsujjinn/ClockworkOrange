@@ -21,4 +21,18 @@ object Config {
         )
         return prefs.getString("API_KEY", "") ?: ""
     }
+
+    fun setApiKey(context: Context, apiKey: String) {
+        val masterKey = MasterKey.Builder(context)
+            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+            .build()
+        val prefs = EncryptedSharedPreferences.create(
+            context,
+            "legend_prefs",
+            masterKey,
+            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+        )
+        prefs.edit().putString("API_KEY", apiKey).apply()
+    }
 }
