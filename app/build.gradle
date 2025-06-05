@@ -2,8 +2,6 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
     id 'org.jetbrains.kotlin.plugin.serialization' version '1.8.10'
-    id 'kotlin-kapt'
-    id 'dagger.hilt.android.plugin'
 }
 
 android {
@@ -31,8 +29,6 @@ android {
 }
 
 dependencies {
-    implementation "com.squareup.retrofit2:retrofit:2.9.0"
-    implementation "com.squareup.retrofit2:converter-kotlinx-serialization:0.8.0"
     implementation "com.squareup.okhttp3:okhttp:4.9.3"
     implementation "androidx.compose.ui:ui:1.4.0"
     implementation "androidx.activity:activity-compose:1.6.0"
@@ -43,7 +39,5 @@ dependencies {
     implementation "androidx.compose.material3:material3:1.1.0"
     implementation "androidx.compose.ui:ui-tooling-preview:1.4.0"
     debugImplementation "androidx.compose.ui:ui-tooling:1.4.0"
-    implementation "com.google.dagger:hilt-android:2.50"
-    kapt "com.google.dagger:hilt-compiler:2.50"
     testImplementation "junit:junit:4.13.2"
 }

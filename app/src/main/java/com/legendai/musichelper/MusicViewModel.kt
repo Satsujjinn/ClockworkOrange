@@ -4,16 +4,13 @@ import android.content.Context
 import java.io.File
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import com.legendai.musichelper.util.ChordGenerator
 
 // ViewModel handling business logic and exposing Compose states
-@HiltViewModel
-class MusicViewModel @Inject constructor(
+class MusicViewModel(
     private val repository: MusicRepository
 ) : ViewModel() {
 
