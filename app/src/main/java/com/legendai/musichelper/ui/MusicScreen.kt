@@ -122,10 +122,15 @@ fun AudioPlayerSection(response: GenerateSongResponse) {
 fun AudioPlayer(url: String, label: String) {
     val context = LocalContext.current
     var playing by remember { mutableStateOf(false) }
-    val player = remember {
+    val player = remember(url) {
         ExoPlayer.Builder(context).build().apply {
             setMediaItem(MediaItem.fromUri(url))
             prepare()
+        }
+    }
+    DisposableEffect(player) {
+        onDispose {
+            player.release()
         }
     }
     Row(verticalAlignment = Alignment.CenterVertically) {
