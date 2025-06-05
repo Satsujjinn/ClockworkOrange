@@ -8,6 +8,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
+import okhttp3.CertificatePinner
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.json.Json
@@ -19,8 +20,16 @@ import javax.inject.Singleton
 object AppModule {
     @Provides
     @Singleton
-    fun provideOkHttpClient(): OkHttpClient =
-        OkHttpClient.Builder().build()
+    fun provideOkHttpClient(): OkHttpClient {
+        val pinner = CertificatePinner.Builder()
+            .add(
+                "api-inference.huggingface.co",
+                "sha256/ivtlEFSWNlBFZKTeymRAlMziEv6bCcjNELEhKpI7mFQ="
+            ).build()
+        return OkHttpClient.Builder()
+            .certificatePinner(pinner)
+            .build()
+    }
 
     @Provides
     @Singleton
