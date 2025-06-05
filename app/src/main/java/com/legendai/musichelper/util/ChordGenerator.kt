@@ -15,7 +15,15 @@ object ChordGenerator {
         if (cleaned.isEmpty()) return null
         val minor = cleaned.endsWith("m")
         if (minor) cleaned = cleaned.removeSuffix("m").trim()
-        val root = cleaned.uppercase()
+        var root = cleaned.uppercase()
+        root = when (root) {
+            "DB" -> "C#"
+            "EB" -> "D#"
+            "GB" -> "F#"
+            "AB" -> "G#"
+            "BB" -> "A#"
+            else -> root
+        }
         val index = chromatic.indexOf(root)
         if (index == -1) return null
         return index to minor
