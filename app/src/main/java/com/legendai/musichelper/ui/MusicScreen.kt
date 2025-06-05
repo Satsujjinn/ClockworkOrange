@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.legendai.musichelper.GenerateSongRequest
+import com.legendai.musichelper.Parameters
 import com.legendai.musichelper.MusicViewModel
 // Exporting to the app specific external directory does not require
 // runtime storage permission, so no permission APIs are needed here.
@@ -26,6 +27,7 @@ fun MusicScreen(viewModel: MusicViewModel, snackbarHostState: SnackbarHostState)
     var genre by remember { mutableStateOf("rock") }
     var key by remember { mutableStateOf(TextFieldValue("C")) }
     var tempo by remember { mutableStateOf(120f) }
+    var duration by remember { mutableStateOf(30f) }
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -65,6 +67,11 @@ fun MusicScreen(viewModel: MusicViewModel, snackbarHostState: SnackbarHostState)
             Slider(value = tempo, onValueChange = { tempo = it }, valueRange = 60f..180f)
             Spacer(Modifier.height(8.dp))
 
+            // Duration slider
+            Text(text = "Duration: ${duration.toInt()}s")
+            Slider(value = duration, onValueChange = { duration = it }, valueRange = 5f..60f)
+            Spacer(Modifier.height(8.dp))
+
             // Key input
             TextField(value = key, onValueChange = { key = it }, label = { Text("Key") })
             Spacer(Modifier.height(8.dp))
@@ -80,7 +87,10 @@ fun MusicScreen(viewModel: MusicViewModel, snackbarHostState: SnackbarHostState)
                 }
                 viewModel.generateSong(
                     context = LocalContext.current,
-                    request = GenerateSongRequest(inputs = prompt),
+                    request = GenerateSongRequest(
+                        inputs = prompt,
+                        parameters = Parameters(duration = duration.toInt())
+                    ),
                     key = key.text,
                     genre = genre
                 )
