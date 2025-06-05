@@ -4,7 +4,7 @@ This app uses the open-source MusicGen model hosted on Hugging Face to generate 
 
 ## Setup
 1. Obtain a free API token from [Hugging Face](https://huggingface.co/settings/tokens).
-2. Run the app once to create encrypted preferences, then open the device's `data/data/com.legendai.musichelper/shared_prefs/legend_prefs.xml` and insert your `API_KEY` value.
+2. Launch the app and open **Settings** from the menu to enter your API token. It will be stored securely in encrypted preferences.
 3. Alternatively, modify `Config.kt` to provide the token directly.
 4. Ensure the Android SDK path is configured. Copy `local.properties.example` to `local.properties` and update `sdk.dir` to point to your SDK installation.
 
