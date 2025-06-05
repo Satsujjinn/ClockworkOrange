@@ -4,6 +4,7 @@ import android.content.Context
 import java.io.File
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -27,7 +28,7 @@ class MusicViewModel(
     val chords: StateFlow<List<String>> = _chords
 
     fun generateSong(context: Context, request: GenerateSongRequest, key: String, genre: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val apiKey = Config.getApiKey(context)
             try {
                 _progress.value = 0.1f
@@ -44,7 +45,7 @@ class MusicViewModel(
 
     fun clearError() { _error.value = null }
     fun mixdownAndExport(context: Context, response: GenerateSongResponse) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
                 val input = File(response.audioPath)
                 val output = File(context.getExternalFilesDir(null), "musicgen.wav")
