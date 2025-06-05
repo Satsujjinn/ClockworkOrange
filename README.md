@@ -21,5 +21,6 @@ This app uses the open-source MusicGen model hosted on Hugging Face to generate 
 3. Tap **Generate Song** to call MusicGen and display progress.
 4. Play the generated preview.
 5. Tap **Export** to save the WAV file under the app's external files directory.
+   The export uses an app-specific folder so no storage permission is needed.
 
 Enjoy experimenting with MusicGen!
