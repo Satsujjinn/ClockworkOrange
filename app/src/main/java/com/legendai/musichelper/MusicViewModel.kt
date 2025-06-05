@@ -31,8 +31,10 @@ class MusicViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             val apiKey = Config.getApiKey(context)
             try {
-                _progress.value = 0.1f
-                val response = repository.generateSong(apiKey, request, context)
+                _progress.value = 0f
+                val response = repository.generateSong(apiKey, request, context) { p ->
+                    _progress.value = p
+                }
                 _audio.value = response
                 _chords.value = ChordGenerator.suggest(key, genre)
                 _progress.value = 1f

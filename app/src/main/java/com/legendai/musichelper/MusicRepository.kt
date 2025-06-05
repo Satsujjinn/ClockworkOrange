@@ -9,6 +9,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
+import com.legendai.musichelper.network.ProgressResponseBody
 
 // Repository executing network calls with OkHttp
 class MusicRepository(private val client: OkHttpClient) {
@@ -16,7 +17,8 @@ class MusicRepository(private val client: OkHttpClient) {
     suspend fun generateSong(
         apiKey: String,
         request: GenerateSongRequest,
-        context: Context
+        context: Context,
+        onProgress: (Float) -> Unit = {}
     ): GenerateSongResponse {
         val json = Json.encodeToString(request)
         val body = json.toRequestBody("application/json".toMediaType())
@@ -27,8 +29,12 @@ class MusicRepository(private val client: OkHttpClient) {
             .build()
         client.newCall(httpRequest).execute().use { response ->
             if (!response.isSuccessful) throw java.io.IOException("Network error")
+
+            val body = response.body ?: throw java.io.IOException("Empty body")
+            val progressBody = ProgressResponseBody(body, onProgress)
+
             val file = File.createTempFile("musicgen_", ".wav", context.cacheDir)
-            response.body?.byteStream()?.use { input ->
+            progressBody.byteStream().use { input ->
                 file.outputStream().use { output ->
                     input.copyTo(output)
                 }

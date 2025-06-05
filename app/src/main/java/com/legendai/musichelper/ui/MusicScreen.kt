@@ -114,6 +114,7 @@ fun MusicScreen(
 
             if (progress > 0f && progress < 1f) {
                 LinearProgressIndicator(progress = progress, modifier = Modifier.fillMaxWidth())
+                Text(text = "${(progress * 100).toInt()}%", modifier = Modifier.align(Alignment.CenterHorizontally))
             }
 
             audio?.let { result ->

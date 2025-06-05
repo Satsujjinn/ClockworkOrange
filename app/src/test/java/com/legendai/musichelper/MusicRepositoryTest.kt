@@ -55,10 +55,12 @@ class MusicRepositoryTest {
                 .setHeader("Content-Type", "application/octet-stream")
         )
 
+        var progress = 0f
         val result = repository.generateSong(
             apiKey = "token",
             request = GenerateSongRequest(inputs = "prompt"),
-            context = context
+            context = context,
+            onProgress = { progress = it }
         )
 
         val recorded = server.takeRequest()
@@ -67,6 +69,7 @@ class MusicRepositoryTest {
         val file = File(result.audioPath)
         assertTrue(file.exists())
         assertEquals("OK", file.readText())
+        assertEquals(1f, progress)
     }
 
     @Test
@@ -77,7 +80,8 @@ class MusicRepositoryTest {
             repository.generateSong(
                 apiKey = "token",
                 request = GenerateSongRequest(inputs = "prompt"),
-                context = context
+                context = context,
+                onProgress = {}
             )
         }
     }
