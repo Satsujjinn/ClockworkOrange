@@ -5,10 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.getValue
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.legendai.musichelper.ui.MusicScreen
 import com.legendai.musichelper.ui.theme.MusicGenTheme
@@ -20,10 +17,6 @@ class MainActivity : ComponentActivity() {
             val viewModel: MusicViewModel = viewModel(factory = MusicViewModelFactory)
             MusicGenTheme {
                 val snackbarHostState = remember { SnackbarHostState() }
-                val error by viewModel.error.collectAsStateWithLifecycle()
-                LaunchedEffect(error) {
-                    error?.let { snackbarHostState.showSnackbar(it) }
-                }
                 MusicScreen(viewModel, snackbarHostState)
             }
         }

@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import com.legendai.musichelper.util.ChordGenerator
+import com.legendai.musichelper.util.NetworkUtils
 
 // ViewModel handling business logic and exposing Compose states
 class MusicViewModel(
@@ -29,6 +30,11 @@ class MusicViewModel(
 
     fun generateSong(context: Context, request: GenerateSongRequest, key: String, genre: String) {
         viewModelScope.launch(Dispatchers.IO) {
+            if (!NetworkUtils.isOnline(context)) {
+                _error.value = "No internet connection"
+                return@launch
+            }
+
             val apiKey = Config.getApiKey(context)
             try {
                 _progress.value = 0.1f

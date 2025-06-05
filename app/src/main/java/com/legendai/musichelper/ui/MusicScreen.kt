@@ -24,10 +24,15 @@ fun MusicScreen(viewModel: MusicViewModel, snackbarHostState: SnackbarHostState)
     val progress by viewModel.progress.collectAsState()
     val audio by viewModel.audio.collectAsState()
     val chords by viewModel.chords.collectAsState()
+    val error by viewModel.error.collectAsState()
     var genre by remember { mutableStateOf("rock") }
     var key by remember { mutableStateOf(TextFieldValue("C")) }
     var tempo by remember { mutableStateOf(120f) }
     var duration by remember { mutableStateOf(30f) }
+
+    LaunchedEffect(error) {
+        error?.let { snackbarHostState.showSnackbar(it) }
+    }
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
