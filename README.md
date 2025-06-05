@@ -28,7 +28,7 @@ This app uses the open-source MusicGen model hosted on Hugging Face to generate 
 
 ## Usage
 1. Pick a genre or select a short reference clip.
-2. Adjust tempo and key sliders.
+2. Adjust tempo, key, and duration sliders.
 3. Tap **Generate Song** to call MusicGen and display progress.
 4. Play the generated preview.
 5. Tap **Export** to save the WAV file under the app's external files directory.
