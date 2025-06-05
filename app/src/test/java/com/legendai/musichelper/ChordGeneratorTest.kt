@@ -11,6 +11,8 @@ class ChordGeneratorTest {
         assertTrue(result.isNotEmpty())
         val resultMajor = ChordGenerator.suggest("A", "rock")
         assertTrue(resultMajor.isNotEmpty())
+        val resultFlat = ChordGenerator.suggest("Bb", "rock")
+        assertTrue(resultFlat.isNotEmpty())
     }
 
     @Test
