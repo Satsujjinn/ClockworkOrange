@@ -9,6 +9,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import com.legendai.musichelper.util.ChordGenerator
 
 // ViewModel handling business logic and exposing Compose states
 @HiltViewModel
@@ -25,13 +26,17 @@ class MusicViewModel @Inject constructor(
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
 
-    fun generateSong(context: Context, request: GenerateSongRequest) {
+    private val _chords = MutableStateFlow<List<String>>(emptyList())
+    val chords: StateFlow<List<String>> = _chords
+
+    fun generateSong(context: Context, request: GenerateSongRequest, key: String, genre: String) {
         viewModelScope.launch {
             val apiKey = Config.getApiKey(context)
             try {
                 _progress.value = 0.1f
                 val response = repository.generateSong(apiKey, request, context)
                 _audio.value = response
+                _chords.value = ChordGenerator.suggest(key, genre)
                 _progress.value = 1f
             } catch (e: Exception) {
                 _error.value = "Network error—please retry"
