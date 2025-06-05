@@ -6,7 +6,7 @@ import androidx.security.crypto.MasterKey
 
 // Configuration values such as API base URL and API key loader
 object Config {
-    const val API_BASE_URL = "https://api.legendai.com/v1/"
+    const val API_BASE_URL = "https://api-inference.huggingface.co/"
 
     fun getApiKey(context: Context): String {
         val masterKey = MasterKey.Builder(context)

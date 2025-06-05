@@ -5,13 +5,13 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
-        android:name=".LegendAIApplication"
-        android:label="LegendAI"
+        android:name=".MusicGenApplication"
+        android:label="MusicGen Helper"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.LegendAI">
+        android:theme="@style/Theme.MusicGen">
         <activity
             android:name=".MainActivity"
             android:exported="true">

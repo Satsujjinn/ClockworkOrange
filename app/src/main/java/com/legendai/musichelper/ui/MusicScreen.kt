@@ -1,7 +1,5 @@
 package com.legendai.musichelper.ui
 
-import android.net.Uri
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Pause
@@ -9,7 +7,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.background
 import androidx.compose.material3.*
@@ -26,16 +23,10 @@ import com.google.accompanist.permissions.rememberPermissionState
 @Composable
 fun MusicScreen(viewModel: MusicViewModel, snackbarHostState: SnackbarHostState) {
     val progress by viewModel.progress.collectAsState()
-    val stems by viewModel.stems.collectAsState()
+    val audio by viewModel.audio.collectAsState()
     var genre by remember { mutableStateOf("rock") }
     var key by remember { mutableStateOf(TextFieldValue("C")) }
     var tempo by remember { mutableStateOf(120f) }
-    var referenceUri by remember { mutableStateOf<Uri?>(null) }
-
-    val filePicker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) {
-        referenceUri = it
-    }
-
     val permission = rememberPermissionState(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
 
     Scaffold(
@@ -71,12 +62,6 @@ fun MusicScreen(viewModel: MusicViewModel, snackbarHostState: SnackbarHostState)
             }
             Spacer(Modifier.height(8.dp))
 
-            // Reference audio picker
-            Button(onClick = { filePicker.launch("audio/*") }) {
-                Text(referenceUri?.lastPathSegment ?: "Select Reference Audio")
-            }
-            Spacer(Modifier.height(8.dp))
-
             // Tempo slider
             Text(text = "Tempo: ${tempo.toInt()}")
             Slider(value = tempo, onValueChange = { tempo = it }, valueRange = 60f..180f)
@@ -87,14 +72,12 @@ fun MusicScreen(viewModel: MusicViewModel, snackbarHostState: SnackbarHostState)
             Spacer(Modifier.height(8.dp))
 
             Button(onClick = {
+                val prompt = buildString {
+                    append("A $genre song at ${tempo.toInt()} bpm in the key of ${key.text}.")
+                }
                 viewModel.generateSong(
                     context = LocalContext.current,
-                    request = GenerateSongRequest(
-                        genre = genre,
-                        reference_audio_url = referenceUri?.toString() ?: "",
-                        tempo = tempo.toInt(),
-                        key = key.text
-                    )
+                    request = GenerateSongRequest(inputs = prompt)
                 )
             }) { Text("Generate Song") }
 
@@ -102,14 +85,8 @@ fun MusicScreen(viewModel: MusicViewModel, snackbarHostState: SnackbarHostState)
                 LinearProgressIndicator(progress = progress, modifier = Modifier.fillMaxWidth())
             }
 
-            stems?.let { result ->
-                StemPlayerSection(result)
-                Spacer(Modifier.height(8.dp))
-                Text(
-                    text = "Chord Progression: " +
-                        result.chord_progressions.joinToString(" | "),
-                    style = MaterialTheme.typography.bodyMedium
-                )
+            audio?.let { result ->
+                AudioPlayerSection(result)
                 Spacer(Modifier.height(8.dp))
                 Button(onClick = {
                     if (!permission.status.isGranted) {
@@ -117,24 +94,21 @@ fun MusicScreen(viewModel: MusicViewModel, snackbarHostState: SnackbarHostState)
                     } else {
                         viewModel.mixdownAndExport(LocalContext.current, result)
                     }
-                }) { Text("Mixdown & Export") }
+                }) { Text("Export") }
             }
         }
     }
 }
 
 @Composable
-fun StemPlayerSection(response: GenerateSongResponse) {
+fun AudioPlayerSection(response: GenerateSongResponse) {
     Column {
-        StemPlayer(url = response.synth_url, label = "Synth")
-        StemPlayer(url = response.bass_url, label = "Bass")
-        StemPlayer(url = response.drums_url, label = "Drums")
-        StemPlayer(url = response.solo_wav_url, label = "Solo")
+        AudioPlayer(url = response.audioPath, label = "Preview")
     }
 }
 
 @Composable
-fun StemPlayer(url: String, label: String) {
+fun AudioPlayer(url: String, label: String) {
     val context = LocalContext.current
     var playing by remember { mutableStateOf(false) }
     val player = remember {

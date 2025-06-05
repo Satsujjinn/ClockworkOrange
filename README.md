@@ -1,11 +1,11 @@
-# LegendAI Music Helper
+# MusicGen Helper
 
-LegendAI helps generate AI-powered music compositions.
+This app uses the open-source MusicGen model hosted on Hugging Face to generate AI-powered music compositions.
 
 ## Setup
-1. Obtain an API key from [LegendAI](https://legendai.com) after creating an account.
+1. Obtain a free API token from [Hugging Face](https://huggingface.co/settings/tokens).
 2. Run the app once to create encrypted preferences, then open the device's `data/data/com.legendai.musichelper/shared_prefs/legend_prefs.xml` and insert your `API_KEY` value.
-3. Alternatively, modify `Config.kt` to provide the key directly.
+3. Alternatively, modify `Config.kt` to provide the token directly.
 
 ## Build & Run
 1. Open the project in Android Studio (Electric Eel or later).
@@ -17,8 +17,8 @@ LegendAI helps generate AI-powered music compositions.
 ## Usage
 1. Pick a genre or select a short reference clip.
 2. Adjust tempo and key sliders.
-3. Tap **Generate Song** to call LegendAI and display progress.
-4. Play each generated stem.
-5. Tap **Mixdown & Export** to save a merged WAV file under the app's external files directory.
+3. Tap **Generate Song** to call MusicGen and display progress.
+4. Play the generated preview.
+5. Tap **Export** to save the WAV file under the app's external files directory.
 
-Enjoy experimenting with LegendAI!
+Enjoy experimenting with MusicGen!
