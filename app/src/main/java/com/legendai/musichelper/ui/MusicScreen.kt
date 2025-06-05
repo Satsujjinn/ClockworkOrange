@@ -16,10 +16,8 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.legendai.musichelper.GenerateSongRequest
 import com.legendai.musichelper.MusicViewModel
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.rememberPermissionState
-
-@OptIn(ExperimentalPermissionsApi::class)
+// Exporting to the app specific external directory does not require
+// runtime storage permission, so no permission APIs are needed here.
 @Composable
 fun MusicScreen(viewModel: MusicViewModel, snackbarHostState: SnackbarHostState) {
     val progress by viewModel.progress.collectAsState()
@@ -27,7 +25,6 @@ fun MusicScreen(viewModel: MusicViewModel, snackbarHostState: SnackbarHostState)
     var genre by remember { mutableStateOf("rock") }
     var key by remember { mutableStateOf(TextFieldValue("C")) }
     var tempo by remember { mutableStateOf(120f) }
-    val permission = rememberPermissionState(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -89,11 +86,7 @@ fun MusicScreen(viewModel: MusicViewModel, snackbarHostState: SnackbarHostState)
                 AudioPlayerSection(result)
                 Spacer(Modifier.height(8.dp))
                 Button(onClick = {
-                    if (!permission.status.isGranted) {
-                        permission.launchPermissionRequest()
-                    } else {
-                        viewModel.mixdownAndExport(LocalContext.current, result)
-                    }
+                    viewModel.mixdownAndExport(LocalContext.current, result)
                 }) { Text("Export") }
             }
         }
