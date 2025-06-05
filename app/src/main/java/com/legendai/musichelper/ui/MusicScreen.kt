@@ -22,6 +22,7 @@ import com.legendai.musichelper.MusicViewModel
 fun MusicScreen(viewModel: MusicViewModel, snackbarHostState: SnackbarHostState) {
     val progress by viewModel.progress.collectAsState()
     val audio by viewModel.audio.collectAsState()
+    val chords by viewModel.chords.collectAsState()
     var genre by remember { mutableStateOf("rock") }
     var key by remember { mutableStateOf(TextFieldValue("C")) }
     var tempo by remember { mutableStateOf(120f) }
@@ -68,13 +69,20 @@ fun MusicScreen(viewModel: MusicViewModel, snackbarHostState: SnackbarHostState)
             TextField(value = key, onValueChange = { key = it }, label = { Text("Key") })
             Spacer(Modifier.height(8.dp))
 
+            if (chords.isNotEmpty()) {
+                Text("Suggested progression: " + chords.joinToString(" - "))
+                Spacer(Modifier.height(8.dp))
+            }
+
             Button(onClick = {
                 val prompt = buildString {
                     append("A $genre song at ${tempo.toInt()} bpm in the key of ${key.text}.")
                 }
                 viewModel.generateSong(
                     context = LocalContext.current,
-                    request = GenerateSongRequest(inputs = prompt)
+                    request = GenerateSongRequest(inputs = prompt),
+                    key = key.text,
+                    genre = genre
                 )
             }) { Text("Generate Song") }
 

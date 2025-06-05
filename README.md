@@ -22,5 +22,7 @@ This app uses the open-source MusicGen model hosted on Hugging Face to generate 
 4. Play the generated preview.
 5. Tap **Export** to save the WAV file under the app's external files directory.
    The export uses an app-specific folder so no storage permission is needed.
+6. Review the suggested chord progression displayed before generating to help
+   kick-start your arrangement.
 
 Enjoy experimenting with MusicGen!
