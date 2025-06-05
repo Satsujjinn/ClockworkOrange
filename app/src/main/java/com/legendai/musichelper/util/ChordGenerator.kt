@@ -7,10 +7,15 @@ object ChordGenerator {
     )
 
     private fun parseKey(key: String): Pair<Int, Boolean>? {
-        val trimmed = key.trim().replace("minor", "m", ignoreCase = true)
-        if (trimmed.isEmpty()) return null
-        val minor = trimmed.endsWith("m")
-        val root = trimmed.removeSuffix("m").uppercase()
+        var cleaned = key.trim()
+            .replace("minor", "m", ignoreCase = true)
+            .replace("major", "", ignoreCase = true)
+            .trim()
+
+        if (cleaned.isEmpty()) return null
+        val minor = cleaned.endsWith("m")
+        if (minor) cleaned = cleaned.removeSuffix("m").trim()
+        val root = cleaned.uppercase()
         val index = chromatic.indexOf(root)
         if (index == -1) return null
         return index to minor
