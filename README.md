@@ -9,11 +9,22 @@ This app uses the open-source MusicGen model hosted on Hugging Face to generate 
 4. Ensure the Android SDK path is configured. Copy `local.properties.example` to `local.properties` and update `sdk.dir` to point to your SDK installation.
 
 ## Build & Run
-1. Open the project in Android Studio (Electric Eel or later).
-2. Allow Gradle to download dependencies. If the Gradle wrapper JAR is missing,
-   use a locally installed Gradle (`gradle assembleDebug`).
-3. Connect an Android device or start an emulator.
-4. Press **Run**.
+1. Clone the repository and enter the project directory:
+   ```bash
+   git clone <repo-url>
+   cd ClockworkOrange
+   ```
+2. Copy `local.properties.example` to `local.properties` and set `sdk.dir` to
+   your Android SDK location. The file is ignored by Git, so commit it only if
+   you want to share the SDK path (e.g. for CI).
+3. Open the project in Android Studio (Hedgehog or newer) by selecting
+   `settings.gradle` when prompted.
+4. Android Studio will sync using the Gradle wrapper. The wrapper will
+   automatically download `gradle-wrapper.jar` on first run, so accept any
+   prompts to trust the wrapper and allow dependencies to download.
+5. Provide your MusicGen API key (see **Setup** above).
+6. Connect an Android device or start an emulator.
+7. Press **Run** or execute `./gradlew assembleDebug` from the command line.
 
 ## Usage
 1. Pick a genre or select a short reference clip.
