@@ -47,11 +47,18 @@ class AudioMixerTest {
         val f2 = createWav(s2)
         val out = File.createTempFile("mix_out_", ".wav")
         AudioMixer.mixWavFiles(listOf(f1.toURI().toString(), f2.toURI().toString()), out)
-        val bytes = out.readBytes()
-        val subSize = ByteBuffer.wrap(bytes, 40, 4).order(ByteOrder.LITTLE_ENDIAN).int
-        assertEquals(s1.size * 2, subSize)
-        val firstSample = ByteBuffer.wrap(bytes, 44, 2).order(ByteOrder.LITTLE_ENDIAN).short
-        assertEquals(0, firstSample)
+        val header = ByteArray(44)
+        out.inputStream().use { input ->
+            input.read(header)
+            val subSize = ByteBuffer.wrap(header, 40, 4)
+                .order(ByteOrder.LITTLE_ENDIAN).int
+            assertEquals(s1.size * 2, subSize)
+            val firstBytes = ByteArray(2)
+            input.read(firstBytes)
+            val firstSample = ByteBuffer.wrap(firstBytes)
+                .order(ByteOrder.LITTLE_ENDIAN).short
+            assertEquals(0, firstSample)
+        }
     }
 
     @Test
@@ -68,17 +75,29 @@ class AudioMixerTest {
             out
         )
 
-        val bytes = out.readBytes()
-        val dataSize = ByteBuffer.wrap(bytes, 40, 4)
-            .order(ByteOrder.LITTLE_ENDIAN).int
-        assertEquals(longSamples.size * 2, dataSize)
+        val header = ByteArray(44)
+        val mixed: ShortArray
+        out.inputStream().use { input ->
+            input.read(header)
+            val dataSize = ByteBuffer.wrap(header, 40, 4)
+                .order(ByteOrder.LITTLE_ENDIAN).int
+            assertEquals(longSamples.size * 2, dataSize)
 
-        val sampleCount = dataSize / 2
-        val mixed = ShortArray(sampleCount)
-        val bb = ByteBuffer.wrap(bytes, 44, dataSize)
-            .order(ByteOrder.LITTLE_ENDIAN)
-        for (i in 0 until sampleCount) {
-            mixed[i] = bb.short
+            val sampleCount = dataSize / 2
+            mixed = ShortArray(sampleCount)
+            val buffer = ByteArray(256)
+            var index = 0
+            while (index < sampleCount) {
+                val toRead = minOf(buffer.size, (sampleCount - index) * 2)
+                val r = input.read(buffer, 0, toRead)
+                if (r <= 0) break
+                val bb = ByteBuffer.wrap(buffer, 0, r)
+                    .order(ByteOrder.LITTLE_ENDIAN)
+                val sc = r / 2
+                for (i in 0 until sc) {
+                    mixed[index++] = bb.short
+                }
+            }
         }
 
         // Beyond the end of the short file only the long file contributes
