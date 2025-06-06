@@ -2,9 +2,12 @@ package com.legendai.musichelper
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import java.io.File
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
@@ -14,29 +17,29 @@ class ExportStoreTest {
     @Before
     fun setup() {
         context = ApplicationProvider.getApplicationContext()
-        context.deleteSharedPreferences("exports")
+        File(context.filesDir, "datastore/exports.json").delete()
     }
 
     @After
     fun tearDown() {
-        context.deleteSharedPreferences("exports")
+        File(context.filesDir, "datastore/exports.json").delete()
     }
 
     @Test
-    fun addStoresEntry() {
+    fun addStoresEntry() = runTest {
         ExportStore.add(context, "one.wav")
 
-        val prefs = context.getSharedPreferences("exports", Context.MODE_PRIVATE)
-        val entries = prefs.getStringSet("entries", emptySet())!!
+        val list = ExportStore.list(context)
 
-        assertEquals(1, entries.size)
-        assertTrue(entries.first().startsWith("one.wav|"))
+        assertEquals(1, list.size)
+        assertEquals("one.wav", list[0].fileName)
+        assertTrue(list[0].time > 0)
     }
 
     @Test
-    fun listReturnsEntriesSorted() {
+    fun listReturnsEntriesSorted() = runTest {
         ExportStore.add(context, "first.wav")
-        Thread.sleep(10)
+        delay(10)
         ExportStore.add(context, "second.wav")
 
         val list = ExportStore.list(context)
@@ -48,19 +51,17 @@ class ExportStoreTest {
     }
 
     @Test
-    fun listParsesPipeSeparatedEntries() {
-        val prefs = context.getSharedPreferences("exports", Context.MODE_PRIVATE)
-        prefs.edit().putStringSet("entries", setOf("file|name.wav|123"))!!.apply()
+    fun addFileNameWithPipe() = runTest {
+        ExportStore.add(context, "file|name.wav")
 
         val list = ExportStore.list(context)
 
         assertEquals(1, list.size)
         assertEquals("file|name.wav", list[0].fileName)
-        assertEquals(123, list[0].time)
     }
 
     @Test
-    fun removeDeletesEntry() {
+    fun removeDeletesEntry() = runTest {
         ExportStore.add(context, "a.wav")
         ExportStore.add(context, "b.wav")
 

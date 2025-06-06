@@ -1,37 +1,63 @@
 package com.legendai.musichelper
 
 import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.core.Serializer
+import androidx.datastore.dataStore
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+import java.io.InputStream
+import java.io.OutputStream
+
+@Serializable
+private data class ExportEntries(val entries: List<ExportStore.Entry> = emptyList())
+
+private object ExportEntriesSerializer : Serializer<ExportEntries> {
+    override val defaultValue: ExportEntries = ExportEntries()
+
+    override suspend fun readFrom(input: InputStream): ExportEntries {
+        return try {
+            Json.decodeFromString(ExportEntries.serializer(), input.readBytes().decodeToString())
+        } catch (e: Exception) {
+            defaultValue
+        }
+    }
+
+    override suspend fun writeTo(t: ExportEntries, output: OutputStream) {
+        output.write(Json.encodeToString(ExportEntries.serializer(), t).toByteArray())
+    }
+}
+
+private val Context.exportsDataStore: DataStore<ExportEntries> by dataStore(
+    fileName = "exports.json",
+    serializer = ExportEntriesSerializer
+)
 
 /**
- * Simple helper for tracking exported files using SharedPreferences.
+ * Helper for tracking exported files using DataStore.
  */
 object ExportStore {
-    private const val PREFS = "exports"
-    private const val KEY_ENTRIES = "entries"
-
+    @Serializable
     data class Entry(val fileName: String, val time: Long)
 
-    fun add(context: Context, fileName: String) {
-        val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-        val set = prefs.getStringSet(KEY_ENTRIES, mutableSetOf())!!.toMutableSet()
-        val entry = "$fileName|${System.currentTimeMillis()}"
-        set.add(entry)
-        prefs.edit().putStringSet(KEY_ENTRIES, set).apply()
+    fun flow(context: Context): Flow<List<Entry>> =
+        context.exportsDataStore.data.map { it.entries.sortedByDescending { e -> e.time } }
+
+    suspend fun add(context: Context, fileName: String) {
+        context.exportsDataStore.updateData { current ->
+            current.copy(entries = current.entries + Entry(fileName, System.currentTimeMillis()))
+        }
     }
 
-    fun list(context: Context): List<Entry> {
-        val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-        val set = prefs.getStringSet(KEY_ENTRIES, emptySet()) ?: emptySet()
-        return set.mapNotNull {
-            val parts = it.split('|', limit = 2)
-            if (parts.size == 2) Entry(parts[0], parts[1].toLong()) else null
-        }.sortedByDescending { it.time }
-    }
+    suspend fun list(context: Context): List<Entry> =
+        context.exportsDataStore.data.first().entries.sortedByDescending { it.time }
 
-    fun remove(context: Context, fileName: String) {
-        val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-        val set = prefs.getStringSet(KEY_ENTRIES, mutableSetOf())!!.toMutableSet()
-        set.removeIf { it.startsWith("$fileName|") }
-        prefs.edit().putStringSet(KEY_ENTRIES, set).apply()
+    suspend fun remove(context: Context, fileName: String) {
+        context.exportsDataStore.updateData { current ->
+            current.copy(entries = current.entries.filterNot { it.fileName == fileName })
+        }
     }
 }
