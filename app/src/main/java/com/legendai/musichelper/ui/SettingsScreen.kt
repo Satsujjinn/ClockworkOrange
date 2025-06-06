@@ -14,6 +14,7 @@ import com.legendai.musichelper.Config
 fun SettingsScreen(onDone: () -> Unit) {
     val context = LocalContext.current
     var apiKey by remember { mutableStateOf(Config.getApiKey(context)) }
+    var spotifyKey by remember { mutableStateOf(Config.getSpotifyApiKey(context)) }
 
     Scaffold(
         topBar = {
@@ -40,8 +41,16 @@ fun SettingsScreen(onDone: () -> Unit) {
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(Modifier.height(16.dp))
+            TextField(
+                value = spotifyKey,
+                onValueChange = { spotifyKey = it },
+                label = { Text("Spotify API Key") },
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(Modifier.height(16.dp))
             Button(onClick = {
                 Config.setApiKey(context, apiKey)
+                Config.setSpotifyApiKey(context, spotifyKey)
                 onDone()
             }) {
                 Text("Save")
