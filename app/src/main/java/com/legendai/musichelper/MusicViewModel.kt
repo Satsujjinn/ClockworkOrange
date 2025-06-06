@@ -10,10 +10,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import com.legendai.musichelper.util.ChordGenerator
 import com.legendai.musichelper.util.AudioMixer
+import com.legendai.musichelper.UserPreferencesRepository
 
 // ViewModel handling business logic and exposing Compose states
 class MusicViewModel(
-    private val repository: MusicRepository
+    private val repository: MusicRepository,
+    private val prefs: UserPreferencesRepository,
 ) : ViewModel() {
 
     private val _progress = MutableStateFlow(0f)
@@ -24,6 +26,48 @@ class MusicViewModel(
 
     private val _clips = MutableStateFlow<List<GenerateSongResponse>>(emptyList())
     val clips: StateFlow<List<GenerateSongResponse>> = _clips
+
+    private val _genre = MutableStateFlow("rock")
+    val genre: StateFlow<String> = _genre
+
+    private val _keyPref = MutableStateFlow("C")
+    val key: StateFlow<String> = _keyPref
+
+    private val _tempo = MutableStateFlow(120f)
+    val tempo: StateFlow<Float> = _tempo
+
+    private val _duration = MutableStateFlow(30)
+    val duration: StateFlow<Int> = _duration
+
+    init {
+        viewModelScope.launch {
+            val stored = prefs.getPreferences()
+            _genre.value = stored.genre
+            _keyPref.value = stored.key
+            _tempo.value = stored.tempo
+            _duration.value = stored.duration
+        }
+    }
+
+    fun setGenre(value: String) {
+        _genre.value = value
+        viewModelScope.launch { prefs.setGenre(value) }
+    }
+
+    fun setKey(value: String) {
+        _keyPref.value = value
+        viewModelScope.launch { prefs.setKey(value) }
+    }
+
+    fun setTempo(value: Float) {
+        _tempo.value = value
+        viewModelScope.launch { prefs.setTempo(value) }
+    }
+
+    fun setDuration(value: Int) {
+        _duration.value = value
+        viewModelScope.launch { prefs.setDuration(value) }
+    }
 
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error

@@ -8,7 +8,10 @@ object MusicViewModelFactory : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MusicViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return MusicViewModel(ServiceLocator.repository) as T
+            return MusicViewModel(
+                ServiceLocator.repository,
+                ServiceLocator.prefsRepository
+            ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

@@ -31,10 +31,14 @@ fun MusicScreen(
     val audio by viewModel.audio.collectAsState()
     val clips by viewModel.clips.collectAsState()
     val chords by viewModel.chords.collectAsState()
-    var genre by remember { mutableStateOf("rock") }
-    var key by remember { mutableStateOf(TextFieldValue("C")) }
-    var tempo by remember { mutableStateOf(120f) }
-    var duration by remember { mutableStateOf(30f) }
+    val genre by viewModel.genre.collectAsState()
+    val savedKey by viewModel.key.collectAsState()
+    val tempo by viewModel.tempo.collectAsState()
+    val duration by viewModel.duration.collectAsState()
+    var key by remember { mutableStateOf(TextFieldValue(savedKey)) }
+    LaunchedEffect(savedKey) {
+        if (savedKey != key.text) key = TextFieldValue(savedKey)
+    }
     var selectedClips by remember { mutableStateOf(setOf<String>()) }
 
     LaunchedEffect(key.text, genre) {
@@ -82,7 +86,7 @@ fun MusicScreen(
                 ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
                     listOf("rock", "jazz_fusion", "EDM").forEach {
                         DropdownMenuItem(text = { Text(it) }, onClick = {
-                            genre = it
+                            viewModel.setGenre(it)
                             expanded = false
                         })
                     }
@@ -92,16 +96,16 @@ fun MusicScreen(
 
             // Tempo slider
             Text(text = "Tempo: ${tempo.toInt()}")
-            Slider(value = tempo, onValueChange = { tempo = it }, valueRange = 60f..180f)
+            Slider(value = tempo, onValueChange = { viewModel.setTempo(it) }, valueRange = 60f..180f)
             Spacer(Modifier.height(8.dp))
 
             // Duration slider
             Text(text = "Duration: ${duration.toInt()}s")
-            Slider(value = duration, onValueChange = { duration = it }, valueRange = 5f..60f)
+            Slider(value = duration.toFloat(), onValueChange = { viewModel.setDuration(it.toInt()) }, valueRange = 5f..60f)
             Spacer(Modifier.height(8.dp))
 
             // Key input
-            TextField(value = key, onValueChange = { key = it }, label = { Text("Key") })
+            TextField(value = key, onValueChange = { key = it; viewModel.setKey(it.text) }, label = { Text("Key") })
             Spacer(Modifier.height(8.dp))
 
             if (chords.isNotEmpty()) {
@@ -117,7 +121,7 @@ fun MusicScreen(
                     context = LocalContext.current,
                     request = GenerateSongRequest(
                         inputs = prompt,
-                        parameters = Parameters(duration = duration.toInt())
+                        parameters = Parameters(duration = duration)
                     ),
                     key = key.text,
                     genre = genre
