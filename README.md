@@ -21,18 +21,22 @@ This app uses the open-source MusicGen model hosted on Hugging Face to generate 
    `settings.gradle` when prompted.
 4. Android Studio will sync using the Gradle wrapper. The wrapper will
    automatically download `gradle-wrapper.jar` on first run, so accept any
-   prompts to trust the wrapper and allow dependencies to download.
+   prompts to trust the wrapper and allow dependencies to download. If you run
+   from the command line and `gradle/wrapper/gradle-wrapper.jar` is missing,
+   execute `gradle wrapper` once before using `./gradlew`.
 5. Provide your MusicGen API key (see **Setup** above).
 6. Connect an Android device or start an emulator.
 7. Press **Run** or execute `./gradlew assembleDebug` from the command line.
 
 ## Testing
-1. If `gradle/wrapper/gradle-wrapper.jar` is missing, bootstrap the wrapper:
+1. Make sure an Android SDK is installed and `local.properties` specifies its
+   location via `sdk.dir` as described in **Build & Run**.
+2. If `gradle/wrapper/gradle-wrapper.jar` is missing, bootstrap the wrapper:
    ```bash
    gradle wrapper
    ```
-   This downloads the wrapper JAR so the following commands can run.
-2. Execute the unit tests:
+   Then you can invoke the tests with the wrapper.
+3. Execute the unit tests:
    ```bash
    ./gradlew test
    ```
