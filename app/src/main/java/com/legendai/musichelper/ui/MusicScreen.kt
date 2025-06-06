@@ -6,6 +6,9 @@ import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import android.net.Uri
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import androidx.compose.foundation.layout.*
@@ -34,6 +37,11 @@ fun MusicScreen(
     var key by remember { mutableStateOf(TextFieldValue("C")) }
     var tempo by remember { mutableStateOf(120f) }
     var duration by remember { mutableStateOf(30f) }
+    var customPrompt by remember { mutableStateOf(TextFieldValue("")) }
+    var referenceUri by remember { mutableStateOf<Uri?>(null) }
+    val pickReference = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        referenceUri = uri
+    }
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -92,19 +100,40 @@ fun MusicScreen(
             TextField(value = key, onValueChange = { key = it }, label = { Text("Key") })
             Spacer(Modifier.height(8.dp))
 
+            // Custom prompt input
+            TextField(
+                value = customPrompt,
+                onValueChange = { customPrompt = it },
+                label = { Text("Custom Prompt (optional)") },
+                modifier = Modifier.fillMaxWidth(),
+                minLines = 2,
+                maxLines = 4
+            )
+            Spacer(Modifier.height(8.dp))
+
+            // Reference clip picker
+            Button(onClick = { pickReference.launch("audio/*") }) {
+                Text(if (referenceUri == null) "Select Reference Clip" else "Change Reference Clip")
+            }
+            referenceUri?.let {
+                Spacer(Modifier.height(4.dp))
+                Text(it.lastPathSegment ?: it.toString(), style = MaterialTheme.typography.bodySmall)
+                Spacer(Modifier.height(8.dp))
+            }
+
             if (chords.isNotEmpty()) {
                 Text("Suggested progression: " + chords.joinToString(" - "))
                 Spacer(Modifier.height(8.dp))
             }
 
             Button(onClick = {
-                val prompt = buildString {
-                    append("A $genre song at ${tempo.toInt()} bpm in the key of ${key.text}.")
-                }
+                val defaultPrompt = "A $genre song at ${tempo.toInt()} bpm in the key of ${key.text}."
+                val promptText = if (customPrompt.text.isNotBlank()) customPrompt.text else defaultPrompt
+                val input = referenceUri?.toString() ?: promptText
                 viewModel.generateSong(
                     context = LocalContext.current,
                     request = GenerateSongRequest(
-                        inputs = prompt,
+                        inputs = input,
                         parameters = Parameters(duration = duration.toInt())
                     ),
                     key = key.text,
