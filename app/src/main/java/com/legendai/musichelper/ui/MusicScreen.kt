@@ -1,8 +1,8 @@
 package com.legendai.musichelper.ui
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.List
+import androidx.compose.material3.icons.Icons
+import androidx.compose.material3.icons.filled.Settings
+import androidx.compose.material3.icons.filled.List
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.foundation.layout.*
