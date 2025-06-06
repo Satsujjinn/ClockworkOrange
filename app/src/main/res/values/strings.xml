@@ -1,3 +1,26 @@
 <resources>
     <string name="app_name">MusicGen Helper</string>
+    <string name="settings_title">Settings</string>
+    <string name="settings_icon_desc">Settings</string>
+    <string name="hugging_face_api_key">Hugging Face API Key</string>
+    <string name="save">Save</string>
+    <string name="exports_title">Exports</string>
+    <string name="genre">Genre</string>
+    <string name="tempo_label">Tempo: %1$d</string>
+    <string name="duration_label">Duration: %1$ds</string>
+    <string name="key">Key</string>
+    <string name="suggested_progression">Suggested progression: %1$s</string>
+    <string name="generate_song">Generate Song</string>
+    <string name="cancel">Cancel</string>
+    <string name="clip_label">Clip %1$d</string>
+    <string name="export">Export</string>
+    <string name="mix_export">Mix & Export</string>
+    <string name="genre_rock">rock</string>
+    <string name="genre_jazz_fusion">jazz_fusion</string>
+    <string name="genre_edm">EDM</string>
+    <string name="error_no_api_key">Please set your API key in Settings</string>
+    <string name="error_network">Network error—please retry</string>
+    <string name="error_storage_unavailable">Storage unavailable</string>
+    <string name="saved_to">Saved to %1$s</string>
+    <string name="error_file">File error—please retry</string>
 </resources>

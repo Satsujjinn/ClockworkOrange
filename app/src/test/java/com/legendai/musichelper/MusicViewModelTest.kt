@@ -2,6 +2,7 @@ package com.legendai.musichelper
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
+import com.legendai.musichelper.R
 import java.io.File
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -81,7 +82,7 @@ class MusicViewModelTest {
 
         assertEquals(0f, viewModel.progress.value)
         assertNull(viewModel.audio.value)
-        assertEquals("Network error—please retry", viewModel.error.value)
+        assertEquals(context.getString(R.string.error_network), viewModel.error.value)
     }
 
     @Test
@@ -94,7 +95,7 @@ class MusicViewModelTest {
         assertEquals(0f, viewModel.progress.value)
         assertNull(viewModel.audio.value)
         assertTrue(viewModel.chords.value.isEmpty())
-        assertEquals("Please set your API key in Settings", viewModel.error.value)
+        assertEquals(context.getString(R.string.error_no_api_key), viewModel.error.value)
     }
 
     @Test
@@ -107,7 +108,7 @@ class MusicViewModelTest {
         viewModel.mixdownAndExport(wrapper, GenerateSongResponse(audio.absolutePath))
         advanceUntilIdle()
 
-        assertEquals("Storage unavailable", viewModel.error.value)
+        assertEquals(context.getString(R.string.error_storage_unavailable), viewModel.error.value)
     }
 
     @Test
@@ -120,6 +121,6 @@ class MusicViewModelTest {
         viewModel.mixAndExport(wrapper, listOf(GenerateSongResponse(audio.absolutePath)))
         advanceUntilIdle()
 
-        assertEquals("Storage unavailable", viewModel.error.value)
+        assertEquals(context.getString(R.string.error_storage_unavailable), viewModel.error.value)
     }
 }

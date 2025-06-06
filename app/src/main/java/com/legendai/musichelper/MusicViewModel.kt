@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import com.legendai.musichelper.util.ChordGenerator
 import com.legendai.musichelper.util.AudioMixer
+import com.legendai.musichelper.R
 
 // ViewModel handling business logic and exposing Compose states
 class MusicViewModel(
@@ -38,7 +39,7 @@ class MusicViewModel(
     fun generateSong(context: Context, request: GenerateSongRequest, key: String, genre: String) {
         val apiKey = Config.getApiKey(context)
         if (apiKey.isBlank()) {
-            _error.value = "Please set your API key in Settings"
+            _error.value = context.getString(R.string.error_no_api_key)
             return
         }
         viewModelScope.launch(Dispatchers.IO) {
@@ -52,7 +53,7 @@ class MusicViewModel(
                 updateChords(key, genre)
                 _progress.value = 1f
             } catch (e: Exception) {
-                _error.value = "Network error—please retry"
+                _error.value = context.getString(R.string.error_network)
                 _progress.value = 0f
             }
         }
@@ -69,7 +70,7 @@ class MusicViewModel(
             try {
                 val exportsDir = context.getExternalFilesDir("exports")
                 if (exportsDir == null) {
-                    _error.value = "Storage unavailable"
+                    _error.value = context.getString(R.string.error_storage_unavailable)
                     return@launch
                 }
                 exportsDir.mkdirs()
@@ -79,9 +80,9 @@ class MusicViewModel(
                 val output = File(exportsDir, fileName)
                 input.copyTo(output, overwrite = true)
                 ExportStore.add(context, fileName)
-                _error.value = "Saved to ${output.absolutePath}"
+                _error.value = context.getString(R.string.saved_to, output.absolutePath)
             } catch (e: Exception) {
-                _error.value = "File error—please retry"
+                _error.value = context.getString(R.string.error_file)
             }
         }
     }
@@ -91,16 +92,16 @@ class MusicViewModel(
             try {
                 val baseDir = context.getExternalFilesDir(null)
                 if (baseDir == null) {
-                    _error.value = "Storage unavailable"
+                    _error.value = context.getString(R.string.error_storage_unavailable)
                     return@launch
                 }
 
                 val output = File(baseDir, "musicgen_mix.wav")
                 val urls = responses.map { File(it.audioPath).toURI().toString() }
                 AudioMixer.mixWavFiles(urls, output)
-                _error.value = "Saved to ${output.absolutePath}"
+                _error.value = context.getString(R.string.saved_to, output.absolutePath)
             } catch (e: Exception) {
-                _error.value = "File error—please retry"
+                _error.value = context.getString(R.string.error_file)
             }
         }
     }

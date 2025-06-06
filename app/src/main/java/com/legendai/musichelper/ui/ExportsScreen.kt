@@ -11,11 +11,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.legendai.musichelper.ExportStore
 import com.legendai.musichelper.ui.AudioPlayer
 import android.content.Intent
 import androidx.core.content.FileProvider
+import com.legendai.musichelper.R
 import java.io.File
 import java.text.DateFormat
 
@@ -27,7 +29,7 @@ fun ExportsScreen(onDone: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Exports") },
+                title = { Text(stringResource(R.string.exports_title)) },
                 navigationIcon = {
                     IconButton(onClick = onDone) {
                         Icon(Icons.Default.ArrowBack, contentDescription = null)

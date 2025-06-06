@@ -7,8 +7,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.legendai.musichelper.Config
+import com.legendai.musichelper.R
 
 @Composable
 fun SettingsScreen(onDone: () -> Unit) {
@@ -18,7 +20,7 @@ fun SettingsScreen(onDone: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Settings") },
+                title = { Text(stringResource(R.string.settings_title)) },
                 navigationIcon = {
                     IconButton(onClick = onDone) {
                         Icon(Icons.Default.ArrowBack, contentDescription = null)
@@ -36,7 +38,7 @@ fun SettingsScreen(onDone: () -> Unit) {
             TextField(
                 value = apiKey,
                 onValueChange = { apiKey = it },
-                label = { Text("Hugging Face API Key") },
+                label = { Text(stringResource(R.string.hugging_face_api_key)) },
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(Modifier.height(16.dp))
@@ -44,7 +46,7 @@ fun SettingsScreen(onDone: () -> Unit) {
                 Config.setApiKey(context, apiKey)
                 onDone()
             }) {
-                Text("Save")
+                Text(stringResource(R.string.save))
             }
         }
     }
