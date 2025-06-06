@@ -3,7 +3,11 @@
 This app uses the open-source MusicGen model hosted on Hugging Face to generate AI-powered music compositions.
 
 ## Setup
-1. Obtain a free API token from [Hugging Face](https://huggingface.co/settings/tokens).
+1. **Create a Hugging Face account and generate a free API token**
+   1. Visit [huggingface.co](https://huggingface.co) and sign up or log in.
+   2. Open your [Tokens page](https://huggingface.co/settings/tokens).
+   3. Click **New token**, choose a name (e.g. `MusicGenHelper`), select the **Read** role and create it.
+   4. Copy the resulting string &mdash; this is your MusicGen API key.
 2. Launch the app and open **Settings** from the menu to enter your API token. It will be stored securely in encrypted preferences.
 3. You can also provide the key via the `musicgenApiKey` Gradle property or the
    `MUSICGEN_API_KEY` environment variable, or modify `Config.kt` to hard-code it
