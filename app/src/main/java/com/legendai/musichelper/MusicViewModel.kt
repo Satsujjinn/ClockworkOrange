@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import com.legendai.musichelper.util.ChordGenerator
 import com.legendai.musichelper.util.AudioMixer
+import com.legendai.musichelper.util.MelodyGenerator
 import com.legendai.musichelper.UserPreferencesRepository
 
 // ViewModel handling business logic and exposing Compose states
@@ -38,6 +39,9 @@ class MusicViewModel(
 
     private val _duration = MutableStateFlow(30)
     val duration: StateFlow<Int> = _duration
+
+    private val _melody = MutableStateFlow<List<String>>(emptyList())
+    val melody: StateFlow<List<String>> = _melody
 
     init {
         viewModelScope.launch {
@@ -108,6 +112,10 @@ class MusicViewModel(
     }
 
     fun clearError() { _error.value = null }
+
+    fun generateMelody(key: String, instrument: MelodyGenerator.Instrument) {
+        _melody.value = MelodyGenerator.generate(key, instrument = instrument)
+    }
     fun mixdownAndExport(context: Context, response: GenerateSongResponse) {
         viewModelScope.launch(Dispatchers.IO) {
             try {

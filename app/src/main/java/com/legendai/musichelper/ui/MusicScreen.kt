@@ -13,11 +13,13 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.legendai.musichelper.GenerateSongRequest
 import com.legendai.musichelper.Parameters
 import com.legendai.musichelper.MusicViewModel
+import com.legendai.musichelper.util.MelodyGenerator
 // Exporting to the app specific external directory does not require
 // runtime storage permission, so no permission APIs are needed here.
 @Composable
@@ -35,11 +37,14 @@ fun MusicScreen(
     val savedKey by viewModel.key.collectAsState()
     val tempo by viewModel.tempo.collectAsState()
     val duration by viewModel.duration.collectAsState()
+    val melody by viewModel.melody.collectAsState()
     var key by remember { mutableStateOf(TextFieldValue(savedKey)) }
     LaunchedEffect(savedKey) {
         if (savedKey != key.text) key = TextFieldValue(savedKey)
     }
     var selectedClips by remember { mutableStateOf(setOf<String>()) }
+    var instrumentExpanded by remember { mutableStateOf(false) }
+    var instrument by remember { mutableStateOf(MelodyGenerator.Instrument.GUITAR) }
 
     LaunchedEffect(key.text, genre) {
         viewModel.updateChords(key.text, genre)
@@ -110,6 +115,37 @@ fun MusicScreen(
 
             if (chords.isNotEmpty()) {
                 Text("Suggested progression: " + chords.joinToString(" - "))
+                Spacer(Modifier.height(8.dp))
+            }
+
+            ExposedDropdownMenuBox(expanded = instrumentExpanded, onExpandedChange = { instrumentExpanded = !instrumentExpanded }) {
+                TextField(
+                    value = instrument.name.lowercase().replaceFirstChar { it.uppercase() },
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Instrument") },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = instrumentExpanded) },
+                    modifier = Modifier.menuAnchor()
+                )
+                ExposedDropdownMenu(expanded = instrumentExpanded, onDismissRequest = { instrumentExpanded = false }) {
+                    DropdownMenuItem(text = { Text("Guitar") }, onClick = {
+                        instrument = MelodyGenerator.Instrument.GUITAR
+                        instrumentExpanded = false
+                    })
+                    DropdownMenuItem(text = { Text("Keyboard") }, onClick = {
+                        instrument = MelodyGenerator.Instrument.KEYBOARD
+                        instrumentExpanded = false
+                    })
+                }
+            }
+            Spacer(Modifier.height(8.dp))
+
+            Button(onClick = { viewModel.generateMelody(key.text, instrument) }) { Text("Generate Melody") }
+
+            if (melody.isNotEmpty()) {
+                melody.forEach { line ->
+                    Text(line, fontFamily = FontFamily.Monospace)
+                }
                 Spacer(Modifier.height(8.dp))
             }
 
