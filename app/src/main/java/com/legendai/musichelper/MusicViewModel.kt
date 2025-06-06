@@ -81,7 +81,7 @@ class MusicViewModel(
                 ExportStore.add(context, fileName)
                 _error.value = "Saved to ${output.absolutePath}"
             } catch (e: Exception) {
-                _error.value = "Network error—please retry"
+                _error.value = "File error—please retry"
             }
         }
     }
@@ -100,7 +100,7 @@ class MusicViewModel(
                 AudioMixer.mixWavFiles(urls, output)
                 _error.value = "Saved to ${output.absolutePath}"
             } catch (e: Exception) {
-                _error.value = "Network error—please retry"
+                _error.value = "File error—please retry"
             }
         }
     }
