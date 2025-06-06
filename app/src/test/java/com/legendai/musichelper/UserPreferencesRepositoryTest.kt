@@ -32,7 +32,7 @@ class UserPreferencesRepositoryTest {
 
     @After
     fun tearDown() {
-        context.deleteFile("prefs_test")
+        context.preferencesDataStoreFile("prefs_test").delete()
     }
 
     @Test
