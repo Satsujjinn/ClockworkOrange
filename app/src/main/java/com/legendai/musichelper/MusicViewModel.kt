@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import com.legendai.musichelper.util.ChordGenerator
+import com.legendai.musichelper.util.AudioMixer
 
 // ViewModel handling business logic and exposing Compose states
 class MusicViewModel(
@@ -20,6 +21,9 @@ class MusicViewModel(
 
     private val _audio = MutableStateFlow<GenerateSongResponse?>(null)
     val audio: StateFlow<GenerateSongResponse?> = _audio
+
+    private val _clips = MutableStateFlow<List<GenerateSongResponse>>(emptyList())
+    val clips: StateFlow<List<GenerateSongResponse>> = _clips
 
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
@@ -36,6 +40,7 @@ class MusicViewModel(
                     _progress.value = p
                 }
                 _audio.value = response
+                _clips.value = _clips.value + response
                 _chords.value = ChordGenerator.suggest(key, genre)
                 _progress.value = 1f
             } catch (e: Exception) {
@@ -52,6 +57,19 @@ class MusicViewModel(
                 val input = File(response.audioPath)
                 val output = File(context.getExternalFilesDir(null), "musicgen.wav")
                 input.copyTo(output, overwrite = true)
+                _error.value = "Saved to ${output.absolutePath}"
+            } catch (e: Exception) {
+                _error.value = "Network error—please retry"
+            }
+        }
+    }
+
+    fun mixAndExport(context: Context, responses: List<GenerateSongResponse>) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val output = File(context.getExternalFilesDir(null), "musicgen_mix.wav")
+                val urls = responses.map { File(it.audioPath).toURI().toString() }
+                AudioMixer.mixWavFiles(urls, output)
                 _error.value = "Saved to ${output.absolutePath}"
             } catch (e: Exception) {
                 _error.value = "Network error—please retry"
