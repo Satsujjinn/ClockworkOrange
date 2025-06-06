@@ -41,6 +41,17 @@ This app uses the open-source MusicGen model hosted on Hugging Face to generate 
 6. Connect an Android device or start an emulator.
 7. Press **Run** or execute `./gradlew assembleDebug` from the command line.
 
+### Web Server
+
+To run a simple web interface instead of the Android app:
+
+1. Ensure the `MUSICGEN_API_KEY` environment variable is set.
+2. Start the server with:
+   ```bash
+   ./gradlew :web:run
+   ```
+   Then open `http://localhost:8080` in your browser.
+
 ## Testing
 1. Make sure an Android SDK is installed and `local.properties` specifies its
    location via `sdk.dir` as described in **Build & Run**.
