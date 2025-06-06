@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -13,6 +14,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.legendai.musichelper.ExportStore
 import com.legendai.musichelper.ui.AudioPlayer
+import android.content.Intent
+import androidx.core.content.FileProvider
 import java.io.File
 import java.text.DateFormat
 
@@ -47,6 +50,21 @@ fun ExportsScreen(onDone: () -> Unit) {
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         AudioPlayer(file.absolutePath, label = "")
+                        IconButton(onClick = {
+                            val uri = FileProvider.getUriForFile(
+                                context,
+                                "${context.packageName}.provider",
+                                file
+                            )
+                            val intent = Intent(Intent.ACTION_SEND).apply {
+                                type = "audio/wav"
+                                putExtra(Intent.EXTRA_STREAM, uri)
+                                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                            }
+                            context.startActivity(Intent.createChooser(intent, null))
+                        }) {
+                            Icon(Icons.Default.Share, contentDescription = null)
+                        }
                         IconButton(onClick = {
                             file.delete()
                             ExportStore.remove(context, entry.fileName)
