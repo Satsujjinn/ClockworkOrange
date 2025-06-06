@@ -53,4 +53,37 @@ class AudioMixerTest {
         val firstSample = ByteBuffer.wrap(bytes, 44, 2).order(ByteOrder.LITTLE_ENDIAN).short
         assertEquals(0, firstSample)
     }
+
+    @Test
+    fun mixDifferentLengthsPadsSilence() {
+        val shortSamples = ShortArray(5) { 1000 }
+        val longSamples = ShortArray(10) { (it * 100).toShort() }
+
+        val shortFile = createWav(shortSamples)
+        val longFile = createWav(longSamples)
+        val out = File.createTempFile("mix_out_", ".wav")
+
+        AudioMixer.mixWavFiles(
+            listOf(shortFile.toURI().toString(), longFile.toURI().toString()),
+            out
+        )
+
+        val bytes = out.readBytes()
+        val dataSize = ByteBuffer.wrap(bytes, 40, 4)
+            .order(ByteOrder.LITTLE_ENDIAN).int
+        assertEquals(longSamples.size * 2, dataSize)
+
+        val sampleCount = dataSize / 2
+        val mixed = ShortArray(sampleCount)
+        val bb = ByteBuffer.wrap(bytes, 44, dataSize)
+            .order(ByteOrder.LITTLE_ENDIAN)
+        for (i in 0 until sampleCount) {
+            mixed[i] = bb.short
+        }
+
+        // Beyond the end of the short file only the long file contributes
+        val idx = shortSamples.size + 1
+        assertEquals(longSamples[idx], mixed[idx])
+        assertEquals(longSamples.last(), mixed.last())
+    }
 }
