@@ -2,6 +2,11 @@ package com.legendai.musichelper
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStoreFile
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import java.io.File
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -26,6 +31,8 @@ class MusicViewModelTest {
 
     private lateinit var server: MockWebServer
     private lateinit var repository: MusicRepository
+    private lateinit var prefsRepo: UserPreferencesRepository
+    private lateinit var dataStore: androidx.datastore.core.DataStore<Preferences>
     private lateinit var viewModel: MusicViewModel
     private lateinit var context: Context
 
@@ -34,6 +41,10 @@ class MusicViewModelTest {
         server = MockWebServer()
         server.start()
         context = ApplicationProvider.getApplicationContext()
+        dataStore = PreferenceDataStoreFactory.create(
+            scope = CoroutineScope(mainDispatcherRule.dispatcher + Job())
+        ) { context.preferencesDataStoreFile("test_prefs") }
+        prefsRepo = UserPreferencesRepository(dataStore)
         val client = OkHttpClient.Builder()
             .addInterceptor { chain ->
                 val original = chain.request()
@@ -45,12 +56,13 @@ class MusicViewModelTest {
             }
             .build()
         repository = MusicRepository(client)
-        viewModel = MusicViewModel(repository)
+        viewModel = MusicViewModel(repository, prefsRepo)
     }
 
     @After
     fun tearDown() {
         server.shutdown()
+        context.deleteFile("test_prefs")
     }
 
     @Test
