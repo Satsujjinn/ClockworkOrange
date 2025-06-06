@@ -46,7 +46,10 @@ fun MusicScreen(
                 title = { Text("MusicGen Helper") },
                 actions = {
                     IconButton(onClick = onOpenSettings) {
-                        Icon(Icons.Default.Settings, contentDescription = null)
+                        Icon(
+                            Icons.Default.Settings,
+                            contentDescription = "Settings"
+                        )
                     }
                 }
             )
