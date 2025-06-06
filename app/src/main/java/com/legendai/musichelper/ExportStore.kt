@@ -23,7 +23,7 @@ object ExportStore {
         val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
         val set = prefs.getStringSet(KEY_ENTRIES, emptySet()) ?: emptySet()
         return set.mapNotNull {
-            val parts = it.split("|")
+            val parts = it.split('|', limit = 2)
             if (parts.size == 2) Entry(parts[0], parts[1].toLong()) else null
         }.sortedByDescending { it.time }
     }

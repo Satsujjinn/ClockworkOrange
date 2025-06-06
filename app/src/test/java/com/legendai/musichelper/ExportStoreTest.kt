@@ -48,6 +48,18 @@ class ExportStoreTest {
     }
 
     @Test
+    fun listParsesPipeSeparatedEntries() {
+        val prefs = context.getSharedPreferences("exports", Context.MODE_PRIVATE)
+        prefs.edit().putStringSet("entries", setOf("file|name.wav|123"))!!.apply()
+
+        val list = ExportStore.list(context)
+
+        assertEquals(1, list.size)
+        assertEquals("file|name.wav", list[0].fileName)
+        assertEquals(123, list[0].time)
+    }
+
+    @Test
     fun removeDeletesEntry() {
         ExportStore.add(context, "a.wav")
         ExportStore.add(context, "b.wav")
