@@ -41,6 +41,10 @@ fun MusicScreen(
     var duration by remember { mutableStateOf(30f) }
     var selectedClips by remember { mutableStateOf(setOf<String>()) }
 
+    LaunchedEffect(key.text, genre) {
+        viewModel.updateChords(key.text, genre)
+    }
+
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {

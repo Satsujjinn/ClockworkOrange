@@ -31,6 +31,10 @@ class MusicViewModel(
     private val _chords = MutableStateFlow<List<String>>(emptyList())
     val chords: StateFlow<List<String>> = _chords
 
+    fun updateChords(key: String, genre: String) {
+        _chords.value = ChordGenerator.suggest(key, genre)
+    }
+
     fun generateSong(context: Context, request: GenerateSongRequest, key: String, genre: String) {
         val apiKey = Config.getApiKey(context)
         if (apiKey.isBlank()) {
@@ -45,7 +49,7 @@ class MusicViewModel(
                 }
                 _audio.value = response
                 _clips.value = _clips.value + response
-                _chords.value = ChordGenerator.suggest(key, genre)
+                updateChords(key, genre)
                 _progress.value = 1f
             } catch (e: Exception) {
                 _error.value = "Network error—please retry"
