@@ -129,8 +129,19 @@ fun MusicScreen(
             }) { Text("Generate Song") }
 
             if (progress > 0f && progress < 1f) {
-                LinearProgressIndicator(progress = progress, modifier = Modifier.fillMaxWidth())
-                Text(text = "${(progress * 100).toInt()}%", modifier = Modifier.align(Alignment.CenterHorizontally))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    LinearProgressIndicator(
+                        progress = progress,
+                        modifier = Modifier
+                            .weight(1f)
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    Button(onClick = { viewModel.cancelGeneration() }) { Text("Cancel") }
+                }
+                Text(
+                    text = "${(progress * 100).toInt()}%",
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
             }
 
             LazyColumn {

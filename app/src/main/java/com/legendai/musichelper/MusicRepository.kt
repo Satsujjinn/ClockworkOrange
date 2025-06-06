@@ -12,7 +12,16 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import com.legendai.musichelper.network.ProgressResponseBody
 
 // Repository executing network calls with OkHttp
+import okhttp3.Call
+
 class MusicRepository(private val client: OkHttpClient) {
+
+    private var activeCall: Call? = null
+
+    fun cancel() {
+        activeCall?.cancel()
+        activeCall = null
+    }
 
     suspend fun generateSong(
         apiKey: String,
@@ -27,19 +36,25 @@ class MusicRepository(private val client: OkHttpClient) {
             .post(body)
             .addHeader("Authorization", "Bearer $apiKey")
             .build()
-        client.newCall(httpRequest).execute().use { response ->
-            if (!response.isSuccessful) throw java.io.IOException("Network error")
+        val call = client.newCall(httpRequest)
+        activeCall = call
+        try {
+            call.execute().use { response ->
+                if (!response.isSuccessful) throw java.io.IOException("Network error")
 
-            val body = response.body ?: throw java.io.IOException("Empty body")
-            val progressBody = ProgressResponseBody(body, onProgress)
+                val body = response.body ?: throw java.io.IOException("Empty body")
+                val progressBody = ProgressResponseBody(body, onProgress)
 
-            val file = File.createTempFile("musicgen_", ".wav", context.cacheDir)
-            progressBody.byteStream().use { input ->
-                file.outputStream().use { output ->
-                    input.copyTo(output)
+                val file = File.createTempFile("musicgen_", ".wav", context.cacheDir)
+                progressBody.byteStream().use { input ->
+                    file.outputStream().use { output ->
+                        input.copyTo(output)
+                    }
                 }
+                return GenerateSongResponse(file.absolutePath)
             }
-            return GenerateSongResponse(file.absolutePath)
+        } finally {
+            activeCall = null
         }
     }
 }

@@ -58,6 +58,11 @@ class MusicViewModel(
         }
     }
 
+    fun cancelGeneration() {
+        repository.cancel()
+        _progress.value = 0f
+    }
+
     fun clearError() { _error.value = null }
     fun mixdownAndExport(context: Context, response: GenerateSongResponse) {
         viewModelScope.launch(Dispatchers.IO) {
