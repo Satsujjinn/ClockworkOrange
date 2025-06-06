@@ -82,4 +82,17 @@ class MusicViewModelTest {
         assertNull(viewModel.audio.value)
         assertEquals("Network error—please retry", viewModel.error.value)
     }
+
+    @Test
+    fun generateSong_noApiKey_setsError() = runTest(mainDispatcherRule.dispatcher) {
+        Config.setApiKey(context, "")
+
+        viewModel.generateSong(context, GenerateSongRequest("prompt"), "C", "rock")
+        advanceUntilIdle()
+
+        assertEquals(0f, viewModel.progress.value)
+        assertNull(viewModel.audio.value)
+        assertTrue(viewModel.chords.value.isEmpty())
+        assertEquals("Please set your API key in Settings", viewModel.error.value)
+    }
 }

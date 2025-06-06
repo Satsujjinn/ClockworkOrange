@@ -28,8 +28,12 @@ class MusicViewModel(
     val chords: StateFlow<List<String>> = _chords
 
     fun generateSong(context: Context, request: GenerateSongRequest, key: String, genre: String) {
+        val apiKey = Config.getApiKey(context)
+        if (apiKey.isBlank()) {
+            _error.value = "Please set your API key in Settings"
+            return
+        }
         viewModelScope.launch(Dispatchers.IO) {
-            val apiKey = Config.getApiKey(context)
             try {
                 _progress.value = 0f
                 val response = repository.generateSong(apiKey, request, context) { p ->
