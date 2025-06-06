@@ -136,6 +136,10 @@ fun MusicScreen(
                         instrument = MelodyGenerator.Instrument.KEYBOARD
                         instrumentExpanded = false
                     })
+                    DropdownMenuItem(text = { Text("Bass") }, onClick = {
+                        instrument = MelodyGenerator.Instrument.BASS
+                        instrumentExpanded = false
+                    })
                 }
             }
             Spacer(Modifier.height(8.dp))

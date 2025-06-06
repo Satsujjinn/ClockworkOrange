@@ -16,4 +16,10 @@ class MelodyGeneratorTest {
         val notes = MelodyGenerator.generate("Am", 8, MelodyGenerator.Instrument.KEYBOARD)
         assertTrue(notes.isNotEmpty())
     }
+
+    @Test
+    fun generateBassMelody() {
+        val tab = MelodyGenerator.generate("E", 8, MelodyGenerator.Instrument.BASS)
+        assertTrue(tab.isNotEmpty())
+    }
 }
