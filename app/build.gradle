@@ -15,10 +15,14 @@ android {
         targetSdk 34
         versionCode 1
         versionName "1.0"
+
+        def apiKey = project.hasProperty('musicgenApiKey') ? project.property('musicgenApiKey') : ""
+        buildConfigField "String", "MUSICGEN_API_KEY", '"' + apiKey + '"'
     }
 
     buildFeatures {
         compose true
+        buildConfig true
     }
     composeOptions {
         kotlinCompilerExtensionVersion '1.4.0'
