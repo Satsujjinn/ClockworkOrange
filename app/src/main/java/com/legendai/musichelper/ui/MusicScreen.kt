@@ -15,6 +15,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 import com.legendai.musichelper.GenerateSongRequest
 import com.legendai.musichelper.Parameters
 import com.legendai.musichelper.MusicViewModel
@@ -45,7 +46,7 @@ fun MusicScreen(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
-                title = { Text("MusicGen Helper") },
+                title = { Text(stringResource(R.string.app_name)) },
                 actions = {
                     IconButton(onClick = onOpenExports) {
                         Icon(Icons.Default.List, contentDescription = null)
@@ -53,7 +54,7 @@ fun MusicScreen(
                     IconButton(onClick = onOpenSettings) {
                         Icon(
                             Icons.Default.Settings,
-                            contentDescription = "Settings"
+                            contentDescription = stringResource(R.string.settings)
                         )
                     }
                 }
@@ -75,12 +76,16 @@ fun MusicScreen(
                     value = genre,
                     onValueChange = {},
                     readOnly = true,
-                    label = { Text("Genre") },
+                    label = { Text(stringResource(R.string.genre)) },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                     modifier = Modifier.menuAnchor()
                 )
                 ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                    listOf("rock", "jazz_fusion", "EDM").forEach {
+                    listOf(
+                        stringResource(R.string.genre_rock),
+                        stringResource(R.string.genre_jazz_fusion),
+                        stringResource(R.string.genre_edm)
+                    ).forEach {
                         DropdownMenuItem(text = { Text(it) }, onClick = {
                             genre = it
                             expanded = false
@@ -91,21 +96,21 @@ fun MusicScreen(
             Spacer(Modifier.height(8.dp))
 
             // Tempo slider
-            Text(text = "Tempo: ${tempo.toInt()}")
+            Text(text = stringResource(R.string.tempo, tempo.toInt()))
             Slider(value = tempo, onValueChange = { tempo = it }, valueRange = 60f..180f)
             Spacer(Modifier.height(8.dp))
 
             // Duration slider
-            Text(text = "Duration: ${duration.toInt()}s")
+            Text(text = stringResource(R.string.duration, duration.toInt()))
             Slider(value = duration, onValueChange = { duration = it }, valueRange = 5f..60f)
             Spacer(Modifier.height(8.dp))
 
             // Key input
-            TextField(value = key, onValueChange = { key = it }, label = { Text("Key") })
+            TextField(value = key, onValueChange = { key = it }, label = { Text(stringResource(R.string.key)) })
             Spacer(Modifier.height(8.dp))
 
             if (chords.isNotEmpty()) {
-                Text("Suggested progression: " + chords.joinToString(" - "))
+                Text(stringResource(R.string.suggested_progression, chords.joinToString(" - ")))
                 Spacer(Modifier.height(8.dp))
             }
 
@@ -122,7 +127,7 @@ fun MusicScreen(
                     key = key.text,
                     genre = genre
                 )
-            }) { Text("Generate Song") }
+            }) { Text(stringResource(R.string.generate_song)) }
 
             if (progress > 0f && progress < 1f) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -132,7 +137,7 @@ fun MusicScreen(
                             .weight(1f)
                     )
                     Spacer(Modifier.width(8.dp))
-                    Button(onClick = { viewModel.cancelGeneration() }) { Text("Cancel") }
+                    Button(onClick = { viewModel.cancelGeneration() }) { Text(stringResource(R.string.cancel)) }
                 }
                 Text(
                     text = "${(progress * 100).toInt()}%",
@@ -153,11 +158,11 @@ fun MusicScreen(
                                 }
                             }
                         )
-                        AudioPlayer(url = clip.audioPath, label = "Clip ${index + 1}")
+                        AudioPlayer(url = clip.audioPath, label = stringResource(R.string.clip, index + 1))
                         Spacer(Modifier.width(8.dp))
                         Button(onClick = {
                             viewModel.mixdownAndExport(LocalContext.current, clip)
-                        }) { Text("Export") }
+                        }) { Text(stringResource(R.string.export)) }
                     }
                     Spacer(Modifier.height(8.dp))
                 }
@@ -167,7 +172,7 @@ fun MusicScreen(
                 Button(onClick = {
                     val selected = clips.filter { selectedClips.contains(it.audioPath) }
                     viewModel.mixAndExport(LocalContext.current, selected)
-                }) { Text("Mix & Export") }
+                }) { Text(stringResource(R.string.mix_and_export)) }
             }
         }
     }

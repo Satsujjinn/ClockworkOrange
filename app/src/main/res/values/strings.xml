@@ -1,3 +1,20 @@
 <resources>
     <string name="app_name">MusicGen Helper</string>
+    <string name="settings">Settings</string>
+    <string name="exports">Exports</string>
+    <string name="genre">Genre</string>
+    <string name="genre_rock">rock</string>
+    <string name="genre_jazz_fusion">jazz_fusion</string>
+    <string name="genre_edm">EDM</string>
+    <string name="tempo">Tempo: %1$d</string>
+    <string name="duration">Duration: %1$ds</string>
+    <string name="key">Key</string>
+    <string name="suggested_progression">Suggested progression: %1$s</string>
+    <string name="generate_song">Generate Song</string>
+    <string name="cancel">Cancel</string>
+    <string name="clip">Clip %1$d</string>
+    <string name="export">Export</string>
+    <string name="mix_and_export">Mix &amp; Export</string>
+    <string name="hugging_face_api_key">Hugging Face API Key</string>
+    <string name="save">Save</string>
 </resources>

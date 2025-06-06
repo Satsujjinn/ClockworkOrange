@@ -12,6 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 import com.legendai.musichelper.ExportStore
 import android.content.Intent
 import androidx.core.content.FileProvider
@@ -26,7 +27,7 @@ fun ExportsScreen(onDone: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Exports") },
+                title = { Text(stringResource(R.string.exports)) },
                 navigationIcon = {
                     IconButton(onClick = onDone) {
                         Icon(Icons.Default.ArrowBack, contentDescription = null)

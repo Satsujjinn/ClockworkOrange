@@ -5,6 +5,7 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.assertIsDisplayed
+import com.legendai.musichelper.R
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlin.test.assertNull
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,13 +21,17 @@ class MainActivityTest {
 
     @Test
     fun openSettings_displaysSettingsScreen() {
-        composeTestRule.onNodeWithContentDescription("Settings").performClick()
-        composeTestRule.onNodeWithText("Hugging Face API Key").assertIsDisplayed()
+        val settings = composeTestRule.activity.getString(R.string.settings)
+        composeTestRule.onNodeWithContentDescription(settings).performClick()
+        val apiKey = composeTestRule.activity.getString(R.string.hugging_face_api_key)
+        composeTestRule.onNodeWithText(apiKey).assertIsDisplayed()
     }
 
     @Test
     fun generateSong_showsErrorSnackbar() {
-        composeTestRule.onNodeWithText("Generate Song").performClick()
+        composeTestRule.onNodeWithText(
+            composeTestRule.activity.getString(R.string.generate_song)
+        ).performClick()
         composeTestRule.onNodeWithText("Network error—please retry").assertIsDisplayed()
     }
 
@@ -44,7 +49,9 @@ class MainActivityTest {
                 state.value = GenerateSongResponse(file.absolutePath)
             }
         }
-        composeTestRule.onNodeWithText("Export").performClick()
+        composeTestRule.onNodeWithText(
+            composeTestRule.activity.getString(R.string.export)
+        ).performClick()
         composeTestRule.onNodeWithText("Saved to").assertIsDisplayed()
     }
 
