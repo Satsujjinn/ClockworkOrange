@@ -13,7 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.legendai.musichelper.ExportStore
-import com.legendai.musichelper.ui.AudioPlayer
 import android.content.Intent
 import androidx.core.content.FileProvider
 import java.io.File
