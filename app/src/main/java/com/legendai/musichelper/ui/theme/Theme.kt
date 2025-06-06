@@ -3,11 +3,15 @@ package com.legendai.musichelper.ui.theme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
+import androidx.compose.material3.dynamicDarkColorScheme
+import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.material3.Typography
+import android.os.Build
 
 private val WoodBrown = Color(0xFF8B4513)
 private val RugRed = Color(0xFF8B0000)
@@ -40,6 +44,17 @@ private val LegendTypography = Typography(defaultFontFamily = FontFamily.Cursive
 @Composable
 fun MusicGenTheme(content: @Composable () -> Unit) {
     val darkTheme = isSystemInDarkTheme()
-    val colorScheme = if (darkTheme) DarkColors else LightColors
-    MaterialTheme(colorScheme = colorScheme, typography = LegendTypography, content = content)
+    val context = LocalContext.current
+    val colorScheme = when {
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+        }
+        darkTheme -> DarkColors
+        else -> LightColors
+    }
+    MaterialTheme(
+        colorScheme = colorScheme,
+        typography = LegendTypography,
+        content = content
+    )
 }
