@@ -6,6 +6,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.legendai.musichelper.Config
 import kotlin.test.assertNull
 import kotlinx.coroutines.flow.MutableStateFlow
 import androidx.lifecycle.ViewModelProvider
@@ -26,6 +27,9 @@ class MainActivityTest {
 
     @Test
     fun generateSong_showsErrorSnackbar() {
+        composeTestRule.activityRule.scenario.onActivity { activity ->
+            Config.setApiKey(activity, "dummy")
+        }
         composeTestRule.onNodeWithText("Generate Song").performClick()
         composeTestRule.onNodeWithText("Network error—please retry").assertIsDisplayed()
     }

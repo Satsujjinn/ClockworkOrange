@@ -40,7 +40,7 @@ class MusicViewModelPrefsTest {
 
     @After
     fun tearDown() {
-        context.deleteFile("prefs_vm")
+        context.preferencesDataStoreFile("prefs_vm").delete()
     }
 
     @Test
