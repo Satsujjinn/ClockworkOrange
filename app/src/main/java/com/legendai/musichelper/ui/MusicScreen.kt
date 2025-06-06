@@ -1,8 +1,5 @@
 package com.legendai.musichelper.ui
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.List
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.foundation.layout.*
@@ -24,8 +21,6 @@ import com.legendai.musichelper.MusicViewModel
 fun MusicScreen(
     viewModel: MusicViewModel,
     snackbarHostState: SnackbarHostState,
-    onOpenSettings: () -> Unit = {},
-    onOpenExports: () -> Unit = {}
 ) {
     val progress by viewModel.progress.collectAsState()
     val audio by viewModel.audio.collectAsState()
@@ -44,20 +39,7 @@ fun MusicScreen(
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
-            TopAppBar(
-                title = { Text("MusicGen Helper") },
-                actions = {
-                    IconButton(onClick = onOpenExports) {
-                        Icon(Icons.Default.List, contentDescription = null)
-                    }
-                    IconButton(onClick = onOpenSettings) {
-                        Icon(
-                            Icons.Default.Settings,
-                            contentDescription = "Settings"
-                        )
-                    }
-                }
-            )
+            TopAppBar(title = { Text("MusicGen Helper") })
         },
         containerColor = MaterialTheme.colorScheme.background
     ) { padding ->

@@ -19,7 +19,7 @@ class MainActivityTest {
     val composeTestRule = createAndroidComposeRule<MainActivity>()
 
     @Test
-    fun openSettings_displaysSettingsScreen() {
+    fun openSettings_viaBottomBar_displaysSettingsScreen() {
         composeTestRule.onNodeWithContentDescription("Settings").performClick()
         composeTestRule.onNodeWithText("Hugging Face API Key").assertIsDisplayed()
     }

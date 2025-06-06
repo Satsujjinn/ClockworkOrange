@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
@@ -19,20 +18,13 @@ import java.io.File
 import java.text.DateFormat
 
 @Composable
-fun ExportsScreen(onDone: () -> Unit) {
+fun ExportsScreen() {
     val context = LocalContext.current
     var exports by remember { mutableStateOf(ExportStore.list(context)) }
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Exports") },
-                navigationIcon = {
-                    IconButton(onClick = onDone) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = null)
-                    }
-                }
-            )
+            TopAppBar(title = { Text("Exports") })
         }
     ) { padding ->
         LazyColumn(modifier = Modifier.padding(padding)) {
