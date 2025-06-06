@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.legendai.musichelper.ExportStore
+import kotlinx.coroutines.launch
 import android.content.Intent
 import androidx.core.content.FileProvider
 import java.io.File
@@ -21,7 +22,8 @@ import java.text.DateFormat
 @Composable
 fun ExportsScreen(onDone: () -> Unit) {
     val context = LocalContext.current
-    var exports by remember { mutableStateOf(ExportStore.list(context)) }
+    val scope = rememberCoroutineScope()
+    val exports by ExportStore.flow(context).collectAsState(initial = emptyList())
 
     Scaffold(
         topBar = {
@@ -65,9 +67,10 @@ fun ExportsScreen(onDone: () -> Unit) {
                             Icon(Icons.Default.Share, contentDescription = null)
                         }
                         IconButton(onClick = {
-                            file.delete()
-                            ExportStore.remove(context, entry.fileName)
-                            exports = ExportStore.list(context)
+                            scope.launch {
+                                file.delete()
+                                ExportStore.remove(context, entry.fileName)
+                            }
                         }) {
                             Icon(Icons.Default.Delete, contentDescription = null)
                         }
