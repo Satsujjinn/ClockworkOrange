@@ -6,6 +6,9 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import kotlin.test.assertNull
+import kotlinx.coroutines.flow.MutableStateFlow
+import androidx.lifecycle.ViewModelProvider
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -43,5 +46,28 @@ class MainActivityTest {
         }
         composeTestRule.onNodeWithText("Export").performClick()
         composeTestRule.onNodeWithText("Saved to").assertIsDisplayed()
+    }
+
+    @Test
+    fun snackbarClearsErrorAfterDismiss() {
+        composeTestRule.activityRule.scenario.onActivity { activity ->
+            val viewModel = ViewModelProvider(activity)[MusicViewModel::class.java]
+            val field = viewModel.javaClass.getDeclaredField("_error")
+            field.isAccessible = true
+            val state = field.get(viewModel) as MutableStateFlow<String?>
+            state.value = "Test error"
+        }
+
+        composeTestRule.onNodeWithText("Test error").assertIsDisplayed()
+
+        composeTestRule.mainClock.advanceTimeBy(5000)
+        composeTestRule.waitForIdle()
+
+        var error: String? = "not cleared"
+        composeTestRule.activityRule.scenario.onActivity { activity ->
+            val viewModel = ViewModelProvider(activity)[MusicViewModel::class.java]
+            error = viewModel.error.value
+        }
+        assertNull(error)
     }
 }
