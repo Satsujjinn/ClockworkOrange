@@ -98,6 +98,22 @@ class MusicViewModelTest {
     }
 
     @Test
+    fun generateSong_offline_setsError() = runTest(mainDispatcherRule.dispatcher) {
+        val offline = object : android.content.ContextWrapper(context) {
+            override fun getSystemService(name: String): Any? {
+                return if (name == android.content.Context.CONNECTIVITY_SERVICE) null else super.getSystemService(name)
+            }
+        }
+
+        viewModel.generateSong(offline, GenerateSongRequest("prompt"), "C", "rock")
+        advanceUntilIdle()
+
+        assertEquals(0f, viewModel.progress.value)
+        assertNull(viewModel.audio.value)
+        assertEquals("No internet connection", viewModel.error.value)
+    }
+
+    @Test
     fun mixdownAndExport_nullDir_setsError() = runTest(mainDispatcherRule.dispatcher) {
         val audio = File.createTempFile("clip_", ".wav")
         val wrapper = object : android.content.ContextWrapper(context) {

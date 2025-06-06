@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import com.legendai.musichelper.util.ChordGenerator
 import com.legendai.musichelper.util.AudioMixer
+import com.legendai.musichelper.util.NetworkUtils
 
 // ViewModel handling business logic and exposing Compose states
 class MusicViewModel(
@@ -39,6 +40,10 @@ class MusicViewModel(
         val apiKey = Config.getApiKey(context)
         if (apiKey.isBlank()) {
             _error.value = "Please set your API key in Settings"
+            return
+        }
+        if (!NetworkUtils.isConnected(context)) {
+            _error.value = "No internet connection"
             return
         }
         viewModelScope.launch(Dispatchers.IO) {
