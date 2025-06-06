@@ -10,6 +10,9 @@ import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.background
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -18,7 +21,6 @@ import androidx.compose.ui.unit.dp
 import com.legendai.musichelper.GenerateSongRequest
 import com.legendai.musichelper.Parameters
 import com.legendai.musichelper.MusicViewModel
-import com.legendai.musichelper.GenerateSongResponse
 // Exporting to the app specific external directory does not require
 // runtime storage permission, so no permission APIs are needed here.
 @Composable
@@ -29,11 +31,13 @@ fun MusicScreen(
 ) {
     val progress by viewModel.progress.collectAsState()
     val audio by viewModel.audio.collectAsState()
+    val clips by viewModel.clips.collectAsState()
     val chords by viewModel.chords.collectAsState()
     var genre by remember { mutableStateOf("rock") }
     var key by remember { mutableStateOf(TextFieldValue("C")) }
     var tempo by remember { mutableStateOf(120f) }
     var duration by remember { mutableStateOf(30f) }
+    var selectedClips by remember { mutableStateOf(setOf<String>()) }
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -117,21 +121,36 @@ fun MusicScreen(
                 Text(text = "${(progress * 100).toInt()}%", modifier = Modifier.align(Alignment.CenterHorizontally))
             }
 
-            audio?.let { result ->
-                AudioPlayerSection(result)
-                Spacer(Modifier.height(8.dp))
+            LazyColumn {
+                itemsIndexed(clips) { index, clip ->
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Checkbox(
+                            checked = selectedClips.contains(clip.audioPath),
+                            onCheckedChange = { checked ->
+                                selectedClips = if (checked) {
+                                    selectedClips + clip.audioPath
+                                } else {
+                                    selectedClips - clip.audioPath
+                                }
+                            }
+                        )
+                        AudioPlayer(url = clip.audioPath, label = "Clip ${index + 1}")
+                        Spacer(Modifier.width(8.dp))
+                        Button(onClick = {
+                            viewModel.mixdownAndExport(LocalContext.current, clip)
+                        }) { Text("Export") }
+                    }
+                    Spacer(Modifier.height(8.dp))
+                }
+            }
+
+            if (selectedClips.size > 1) {
                 Button(onClick = {
-                    viewModel.mixdownAndExport(LocalContext.current, result)
-                }) { Text("Export") }
+                    val selected = clips.filter { selectedClips.contains(it.audioPath) }
+                    viewModel.mixAndExport(LocalContext.current, selected)
+                }) { Text("Mix & Export") }
             }
         }
-    }
-}
-
-@Composable
-fun AudioPlayerSection(response: GenerateSongResponse) {
-    Column {
-        AudioPlayer(url = response.audioPath, label = "Preview")
     }
 }
 
