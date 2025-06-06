@@ -27,7 +27,10 @@ class MainActivity : ComponentActivity() {
                 val snackbarHostState = remember { SnackbarHostState() }
                 val error by viewModel.error.collectAsStateWithLifecycle()
                 LaunchedEffect(error) {
-                    error?.let { snackbarHostState.showSnackbar(it) }
+                    error?.let {
+                        snackbarHostState.showSnackbar(it)
+                        viewModel.clearError()
+                    }
                 }
                 when {
                     showSettings -> SettingsScreen { showSettings = false }
