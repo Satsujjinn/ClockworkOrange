@@ -2,6 +2,7 @@ package com.legendai.musichelper
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
+import java.io.File
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -94,5 +95,31 @@ class MusicViewModelTest {
         assertNull(viewModel.audio.value)
         assertTrue(viewModel.chords.value.isEmpty())
         assertEquals("Please set your API key in Settings", viewModel.error.value)
+    }
+
+    @Test
+    fun mixdownAndExport_nullDir_setsError() = runTest(mainDispatcherRule.dispatcher) {
+        val audio = File.createTempFile("clip_", ".wav")
+        val wrapper = object : android.content.ContextWrapper(context) {
+            override fun getExternalFilesDir(type: String?): File? = null
+        }
+
+        viewModel.mixdownAndExport(wrapper, GenerateSongResponse(audio.absolutePath))
+        advanceUntilIdle()
+
+        assertEquals("Storage unavailable", viewModel.error.value)
+    }
+
+    @Test
+    fun mixAndExport_nullDir_setsError() = runTest(mainDispatcherRule.dispatcher) {
+        val audio = File.createTempFile("clip_", ".wav")
+        val wrapper = object : android.content.ContextWrapper(context) {
+            override fun getExternalFilesDir(type: String?): File? = null
+        }
+
+        viewModel.mixAndExport(wrapper, listOf(GenerateSongResponse(audio.absolutePath)))
+        advanceUntilIdle()
+
+        assertEquals("Storage unavailable", viewModel.error.value)
     }
 }

@@ -58,9 +58,14 @@ class MusicViewModel(
     fun mixdownAndExport(context: Context, response: GenerateSongResponse) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val input = File(response.audioPath)
                 val exportsDir = context.getExternalFilesDir("exports")
-                exportsDir?.mkdirs()
+                if (exportsDir == null) {
+                    _error.value = "Storage unavailable"
+                    return@launch
+                }
+                exportsDir.mkdirs()
+
+                val input = File(response.audioPath)
                 val fileName = "musicgen_${System.currentTimeMillis()}.wav"
                 val output = File(exportsDir, fileName)
                 input.copyTo(output, overwrite = true)
@@ -75,7 +80,13 @@ class MusicViewModel(
     fun mixAndExport(context: Context, responses: List<GenerateSongResponse>) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val output = File(context.getExternalFilesDir(null), "musicgen_mix.wav")
+                val baseDir = context.getExternalFilesDir(null)
+                if (baseDir == null) {
+                    _error.value = "Storage unavailable"
+                    return@launch
+                }
+
+                val output = File(baseDir, "musicgen_mix.wav")
                 val urls = responses.map { File(it.audioPath).toURI().toString() }
                 AudioMixer.mixWavFiles(urls, output)
                 _error.value = "Saved to ${output.absolutePath}"
