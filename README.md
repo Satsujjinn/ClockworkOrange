@@ -23,7 +23,14 @@ This app uses the open-source MusicGen model hosted on Hugging Face to generate 
    automatically download `gradle-wrapper.jar` on first run, so accept any
    prompts to trust the wrapper and allow dependencies to download. If you run
    from the command line and `gradle/wrapper/gradle-wrapper.jar` is missing,
-   execute `gradle wrapper` once before using `./gradlew`.
+   bootstrap the wrapper by running the following from the project root (a local
+   Gradle install is required):
+   ```bash
+   gradle wrapper
+   ```
+   After the jar is generated you can invoke tasks with `./gradlew`. Some
+   projects commit the jar so first-time users don't need Gradle installed—check
+   your repository policy before doing so.
 5. Provide your MusicGen API key (see **Setup** above).
 6. Connect an Android device or start an emulator.
 7. Press **Run** or execute `./gradlew assembleDebug` from the command line.
