@@ -26,6 +26,17 @@ This app uses the open-source MusicGen model hosted on Hugging Face to generate 
 6. Connect an Android device or start an emulator.
 7. Press **Run** or execute `./gradlew assembleDebug` from the command line.
 
+## Testing
+1. If `gradle/wrapper/gradle-wrapper.jar` is missing, bootstrap the wrapper:
+   ```bash
+   gradle wrapper
+   ```
+   This downloads the wrapper JAR so the following commands can run.
+2. Execute the unit tests:
+   ```bash
+   ./gradlew test
+   ```
+
 ## Usage
 1. Pick a genre or select a short reference clip.
 2. Adjust tempo, key, and duration sliders.
