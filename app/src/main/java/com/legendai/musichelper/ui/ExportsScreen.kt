@@ -14,6 +14,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.legendai.musichelper.ExportStore
 import com.legendai.musichelper.ui.AudioPlayer
+import com.legendai.musichelper.ui.theme.MusicGenTheme
+import androidx.compose.ui.tooling.preview.Preview
 import android.content.Intent
 import androidx.core.content.FileProvider
 import java.io.File
@@ -78,4 +80,10 @@ fun ExportsScreen(onDone: () -> Unit) {
             }
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ExportsScreenPreview() {
+    MusicGenTheme { ExportsScreen(onDone = {}) }
 }

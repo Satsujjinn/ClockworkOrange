@@ -22,6 +22,10 @@ import androidx.compose.ui.unit.dp
 import com.legendai.musichelper.GenerateSongRequest
 import com.legendai.musichelper.Parameters
 import com.legendai.musichelper.MusicViewModel
+import com.legendai.musichelper.MusicRepository
+import com.legendai.musichelper.ui.theme.MusicGenTheme
+import okhttp3.OkHttpClient
+import androidx.compose.ui.tooling.preview.Preview
 // Exporting to the app specific external directory does not require
 // runtime storage permission, so no permission APIs are needed here.
 @Composable
@@ -200,5 +204,15 @@ fun AudioPlayer(url: String, label: String) {
         }) {
             Icon(if (playing) Icons.Default.Pause else Icons.Default.PlayArrow, contentDescription = null)
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun MusicScreenPreview() {
+    MusicGenTheme {
+        val viewModel = remember { MusicViewModel(MusicRepository(OkHttpClient())) }
+        val hostState = remember { SnackbarHostState() }
+        MusicScreen(viewModel, hostState)
     }
 }
