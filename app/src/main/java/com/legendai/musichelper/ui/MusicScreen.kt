@@ -3,6 +3,8 @@ package com.legendai.musichelper.ui
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.foundation.layout.*
@@ -15,9 +17,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import java.io.File
 import com.legendai.musichelper.GenerateSongRequest
 import com.legendai.musichelper.Parameters
 import com.legendai.musichelper.MusicViewModel
+import com.legendai.musichelper.GenerateSongResponse
 // Exporting to the app specific external directory does not require
 // runtime storage permission, so no permission APIs are needed here.
 @Composable
@@ -36,6 +40,8 @@ fun MusicScreen(
     var tempo by remember { mutableStateOf(120f) }
     var duration by remember { mutableStateOf(30f) }
     var selectedClips by remember { mutableStateOf(setOf<String>()) }
+    var renameTarget by remember { mutableStateOf<com.legendai.musichelper.GenerateSongResponse?>(null) }
+    var renameText by remember { mutableStateOf(TextFieldValue("")) }
 
     LaunchedEffect(key.text, genre) {
         viewModel.updateChords(key.text, genre)
@@ -158,6 +164,12 @@ fun MusicScreen(
                         Button(onClick = {
                             viewModel.mixdownAndExport(LocalContext.current, clip)
                         }) { Text("Export") }
+                        IconButton(onClick = { renameTarget = clip; renameText = TextFieldValue(java.io.File(clip.audioPath).name) }) {
+                            Icon(Icons.Default.Edit, contentDescription = "Rename")
+                        }
+                        IconButton(onClick = { viewModel.deleteClip(clip) }) {
+                            Icon(Icons.Default.Delete, contentDescription = "Delete")
+                        }
                     }
                     Spacer(Modifier.height(8.dp))
                 }
@@ -168,6 +180,25 @@ fun MusicScreen(
                     val selected = clips.filter { selectedClips.contains(it.audioPath) }
                     viewModel.mixAndExport(LocalContext.current, selected)
                 }) { Text("Mix & Export") }
+            }
+
+            renameTarget?.let { target ->
+                AlertDialog(
+                    onDismissRequest = { renameTarget = null },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            viewModel.renameClip(target, renameText.text)
+                            renameTarget = null
+                        }) { Text("OK") }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { renameTarget = null }) { Text("Cancel") }
+                    },
+                    title = { Text("Rename Clip") },
+                    text = {
+                        TextField(value = renameText, onValueChange = { renameText = it })
+                    }
+                )
             }
         }
     }

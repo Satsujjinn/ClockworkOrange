@@ -5,6 +5,7 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertDoesNotExist
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlin.test.assertNull
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -69,5 +70,22 @@ class MainActivityTest {
             error = viewModel.error.value
         }
         assertNull(error)
+    }
+
+    @Test
+    fun deleteClip_removesRow() {
+        composeTestRule.activityRule.scenario.onActivity { activity ->
+            val viewModel = ViewModelProvider(activity)[MusicViewModel::class.java]
+            val cache = activity.cacheDir
+            val file = java.io.File(cache, "clip.wav").apply { writeText("data") }
+            val field = viewModel.javaClass.getDeclaredField("_clips")
+            field.isAccessible = true
+            val state = field.get(viewModel) as MutableStateFlow<List<GenerateSongResponse>>
+            state.value = listOf(GenerateSongResponse(file.absolutePath))
+        }
+
+        composeTestRule.onNodeWithContentDescription("Delete").performClick()
+
+        composeTestRule.onNodeWithText("Clip 1").assertDoesNotExist()
     }
 }

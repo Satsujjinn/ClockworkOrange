@@ -104,4 +104,28 @@ class MusicViewModel(
             }
         }
     }
+
+    fun deleteClip(response: GenerateSongResponse) {
+        File(response.audioPath).delete()
+        _clips.value = _clips.value.filterNot { it.audioPath == response.audioPath }
+    }
+
+    fun renameClip(response: GenerateSongResponse, newName: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val file = File(response.audioPath)
+                val newFile = File(file.parentFile, newName)
+                if (file.renameTo(newFile)) {
+                    val updated = GenerateSongResponse(newFile.absolutePath)
+                    _clips.value = _clips.value.map {
+                        if (it.audioPath == response.audioPath) updated else it
+                    }
+                } else {
+                    _error.value = "File error—please retry"
+                }
+            } catch (e: Exception) {
+                _error.value = "File error—please retry"
+            }
+        }
+    }
 }
