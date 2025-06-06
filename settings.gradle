@@ -1,2 +1,3 @@
 rootProject.name = "MusicGenHelper"
 include(":app")
+include(":web")
