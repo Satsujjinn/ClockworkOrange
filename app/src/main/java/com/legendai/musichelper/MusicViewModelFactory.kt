@@ -10,7 +10,8 @@ object MusicViewModelFactory : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             return MusicViewModel(
                 ServiceLocator.repository,
-                ServiceLocator.prefsRepository
+                ServiceLocator.prefsRepository,
+                ServiceLocator.spotifyService
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")

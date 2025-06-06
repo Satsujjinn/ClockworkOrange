@@ -11,12 +11,15 @@ import kotlinx.coroutines.launch
 import com.legendai.musichelper.util.ChordGenerator
 import com.legendai.musichelper.util.AudioMixer
 import com.legendai.musichelper.util.MelodyGenerator
+import com.legendai.musichelper.util.TabGenerator
 import com.legendai.musichelper.UserPreferencesRepository
+import com.legendai.musichelper.spotify.SpotifyService
 
 // ViewModel handling business logic and exposing Compose states
 class MusicViewModel(
     private val repository: MusicRepository,
     private val prefs: UserPreferencesRepository,
+    private val spotify: SpotifyService,
 ) : ViewModel() {
 
     private val _progress = MutableStateFlow(0f)
@@ -42,6 +45,9 @@ class MusicViewModel(
 
     private val _melody = MutableStateFlow<List<String>>(emptyList())
     val melody: StateFlow<List<String>> = _melody
+
+    private val _tabs = MutableStateFlow<List<String>>(emptyList())
+    val tabs: StateFlow<List<String>> = _tabs
 
     init {
         viewModelScope.launch {
@@ -115,6 +121,26 @@ class MusicViewModel(
 
     fun generateMelody(key: String, instrument: MelodyGenerator.Instrument) {
         _melody.value = MelodyGenerator.generate(key, instrument = instrument)
+    }
+
+    fun generateTabs(context: Context, query: String, instrument: MelodyGenerator.Instrument) {
+        val key = Config.getSpotifyApiKey(context)
+        if (key.isBlank()) {
+            _error.value = "Please set your Spotify API key in Settings"
+            return
+        }
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val track = spotify.searchAndAnalyze(key, query)
+                if (track == null) {
+                    _error.value = "Track not found"
+                    return@launch
+                }
+                _tabs.value = TabGenerator.generate(track, instrument)
+            } catch (e: Exception) {
+                _error.value = "Spotify error"
+            }
+        }
     }
     fun mixdownAndExport(context: Context, response: GenerateSongResponse) {
         viewModelScope.launch(Dispatchers.IO) {

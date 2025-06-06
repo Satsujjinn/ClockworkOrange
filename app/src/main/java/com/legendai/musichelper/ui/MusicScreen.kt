@@ -38,6 +38,7 @@ fun MusicScreen(
     val tempo by viewModel.tempo.collectAsState()
     val duration by viewModel.duration.collectAsState()
     val melody by viewModel.melody.collectAsState()
+    val tabs by viewModel.tabs.collectAsState()
     var key by remember { mutableStateOf(TextFieldValue(savedKey)) }
     LaunchedEffect(savedKey) {
         if (savedKey != key.text) key = TextFieldValue(savedKey)
@@ -45,6 +46,9 @@ fun MusicScreen(
     var selectedClips by remember { mutableStateOf(setOf<String>()) }
     var instrumentExpanded by remember { mutableStateOf(false) }
     var instrument by remember { mutableStateOf(MelodyGenerator.Instrument.GUITAR) }
+    var tabInstrumentExpanded by remember { mutableStateOf(false) }
+    var tabInstrument by remember { mutableStateOf(MelodyGenerator.Instrument.GUITAR) }
+    var search by remember { mutableStateOf(TextFieldValue("")) }
 
     LaunchedEffect(key.text, genre) {
         viewModel.updateChords(key.text, genre)
@@ -132,6 +136,10 @@ fun MusicScreen(
                         instrument = MelodyGenerator.Instrument.GUITAR
                         instrumentExpanded = false
                     })
+                    DropdownMenuItem(text = { Text("Bass") }, onClick = {
+                        instrument = MelodyGenerator.Instrument.BASS
+                        instrumentExpanded = false
+                    })
                     DropdownMenuItem(text = { Text("Keyboard") }, onClick = {
                         instrument = MelodyGenerator.Instrument.KEYBOARD
                         instrumentExpanded = false
@@ -144,6 +152,48 @@ fun MusicScreen(
 
             if (melody.isNotEmpty()) {
                 melody.forEach { line ->
+                    Text(line, fontFamily = FontFamily.Monospace)
+                }
+                Spacer(Modifier.height(8.dp))
+            }
+
+            TextField(
+                value = search,
+                onValueChange = { search = it },
+                label = { Text("Song search") }
+            )
+            Spacer(Modifier.height(8.dp))
+
+            ExposedDropdownMenuBox(expanded = tabInstrumentExpanded, onExpandedChange = { tabInstrumentExpanded = !tabInstrumentExpanded }) {
+                TextField(
+                    value = tabInstrument.name.lowercase().replaceFirstChar { it.uppercase() },
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Tab Instrument") },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = tabInstrumentExpanded) },
+                    modifier = Modifier.menuAnchor()
+                )
+                ExposedDropdownMenu(expanded = tabInstrumentExpanded, onDismissRequest = { tabInstrumentExpanded = false }) {
+                    DropdownMenuItem(text = { Text("Guitar") }, onClick = {
+                        tabInstrument = MelodyGenerator.Instrument.GUITAR
+                        tabInstrumentExpanded = false
+                    })
+                    DropdownMenuItem(text = { Text("Bass") }, onClick = {
+                        tabInstrument = MelodyGenerator.Instrument.BASS
+                        tabInstrumentExpanded = false
+                    })
+                    DropdownMenuItem(text = { Text("Keyboard") }, onClick = {
+                        tabInstrument = MelodyGenerator.Instrument.KEYBOARD
+                        tabInstrumentExpanded = false
+                    })
+                }
+            }
+            Spacer(Modifier.height(8.dp))
+
+            Button(onClick = { viewModel.generateTabs(LocalContext.current, search.text, tabInstrument) }) { Text("Generate Tabs") }
+
+            if (tabs.isNotEmpty()) {
+                tabs.forEach { line ->
                     Text(line, fontFamily = FontFamily.Monospace)
                 }
                 Spacer(Modifier.height(8.dp))

@@ -18,6 +18,9 @@ android {
 
         def apiKey = project.hasProperty('musicgenApiKey') ? project.property('musicgenApiKey') : ""
         buildConfigField "String", "MUSICGEN_API_KEY", '"' + apiKey + '"'
+
+        def spotifyKey = project.hasProperty('spotifyApiKey') ? project.property('spotifyApiKey') : ""
+        buildConfigField "String", "SPOTIFY_API_KEY", '"' + spotifyKey + '"'
     }
 
     buildFeatures {

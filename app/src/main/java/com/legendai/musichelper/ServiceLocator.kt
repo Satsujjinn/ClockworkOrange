@@ -3,6 +3,7 @@ package com.legendai.musichelper
 import android.content.Context
 import okhttp3.CertificatePinner
 import okhttp3.OkHttpClient
+import com.legendai.musichelper.spotify.SpotifyService
 
 // Simple object providing shared dependencies without DI frameworks
 object ServiceLocator {
@@ -20,6 +21,7 @@ object ServiceLocator {
     }
 
     val repository: MusicRepository by lazy { MusicRepository(httpClient) }
+    val spotifyService: SpotifyService by lazy { SpotifyService(httpClient) }
 
     fun init(context: Context) {
         prefsRepository = UserPreferencesRepository(context.userPreferencesDataStore)
