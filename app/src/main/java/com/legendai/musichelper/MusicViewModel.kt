@@ -59,8 +59,12 @@ class MusicViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val input = File(response.audioPath)
-                val output = File(context.getExternalFilesDir(null), "musicgen.wav")
+                val exportsDir = context.getExternalFilesDir("exports")
+                exportsDir?.mkdirs()
+                val fileName = "musicgen_${System.currentTimeMillis()}.wav"
+                val output = File(exportsDir, fileName)
                 input.copyTo(output, overwrite = true)
+                ExportStore.add(context, fileName)
                 _error.value = "Saved to ${output.absolutePath}"
             } catch (e: Exception) {
                 _error.value = "Network error—please retry"

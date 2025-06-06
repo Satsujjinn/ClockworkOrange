@@ -4,6 +4,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.List
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
 import com.google.android.exoplayer2.ExoPlayer
@@ -27,7 +28,8 @@ import com.legendai.musichelper.MusicViewModel
 fun MusicScreen(
     viewModel: MusicViewModel,
     snackbarHostState: SnackbarHostState,
-    onOpenSettings: () -> Unit = {}
+    onOpenSettings: () -> Unit = {},
+    onOpenExports: () -> Unit = {}
 ) {
     val progress by viewModel.progress.collectAsState()
     val audio by viewModel.audio.collectAsState()
@@ -45,6 +47,9 @@ fun MusicScreen(
             TopAppBar(
                 title = { Text("MusicGen Helper") },
                 actions = {
+                    IconButton(onClick = onOpenExports) {
+                        Icon(Icons.Default.List, contentDescription = null)
+                    }
                     IconButton(onClick = onOpenSettings) {
                         Icon(
                             Icons.Default.Settings,
