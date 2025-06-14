@@ -3,11 +3,13 @@ import Box from '@mui/material/Box';
 
 export interface WaveformViewerProps {
   audioBuffer?: AudioBuffer;
+  analyser?: AnalyserNode;
   markers?: Array<{ time: number; label?: string }>;
 }
 
-export const WaveformViewer = ({ audioBuffer, markers = [] }: WaveformViewerProps) => {
+export const WaveformViewer = ({ audioBuffer, analyser, markers = [] }: WaveformViewerProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const raf = useRef<number>();
 
   useEffect(() => {
     if (!canvasRef.current || !audioBuffer) return;
@@ -31,7 +33,31 @@ export const WaveformViewer = ({ audioBuffer, markers = [] }: WaveformViewerProp
       ctx.fillStyle = 'yellow';
       ctx.fillRect(x, 0, 2, height);
     });
+    return () => cancelAnimationFrame(raf.current!);
   }, [audioBuffer, markers]);
+
+  useEffect(() => {
+    if (!canvasRef.current || !analyser) return;
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    const buffer = new Uint8Array(analyser.frequencyBinCount);
+    const draw = () => {
+      analyser.getByteFrequencyData(buffer);
+      ctx.clearRect(0, 80, canvas.width, canvas.height - 80);
+      ctx.fillStyle = 'magenta';
+      buffer.forEach((v, i) => {
+        const x = (i / buffer.length) * canvas.width;
+        const h = (v / 255) * 40;
+        ctx.fillRect(x, canvas.height - h, 2, h);
+      });
+      raf.current = requestAnimationFrame(draw);
+    };
+    draw();
+    return () => cancelAnimationFrame(raf.current!);
+  }, [analyser]);
 
   return <Box sx={{ p: 1 }}><canvas ref={canvasRef} width={400} height={80} /></Box>;
 };
+
+export default WaveformViewer;
