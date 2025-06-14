@@ -51,6 +51,7 @@ export const App = () => {
           onRecord={() => {}}
           onToggleTheme={() => setDark(!dark)}
           dark={dark}
+          bindKeys
         />
       </Box>
     </ThemeProvider>
