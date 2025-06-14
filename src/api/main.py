@@ -1,7 +1,7 @@
 import asyncio
 import logging
 import os
-from typing import Any, AsyncGenerator, Dict, List
+from typing import Any, AsyncGenerator, Dict, List, Optional
 
 from starlette.concurrency import run_in_threadpool
 from prometheus_client import Histogram, generate_latest
@@ -23,6 +23,27 @@ from ..feature_extraction.mfcc import extract_mfcc
 from ..filter.denoise import denoise
 from ..llm.chord_suggester import ChordSuggester
 from ..accompaniment.generator import AccompanimentGenerator
+
+# simple mapping of chord roots to note names
+NOTE_MAP = {
+    "C": "C4",
+    "D": "D4",
+    "E": "E4",
+    "F": "F4",
+    "G": "G4",
+    "A": "A4",
+    "B": "B4",
+}
+
+
+def serialize_midi(note: str, velocity: int = 64, duration: int = 500) -> Dict[str, Any]:
+    """Serialize a note to a simple MIDI-like JSON message."""
+    return {
+        "type": "note_on",
+        "note": NOTE_MAP.get(note.upper(), "C4"),
+        "velocity": velocity,
+        "duration": duration,
+    }
 
 REQUEST_LATENCY = Histogram(
     "request_latency_seconds",
@@ -164,6 +185,32 @@ async def _heartbeat(ws: WebSocket) -> None:
     while True:
         await asyncio.sleep(10)
         await ws.send_json({"type": "ping"})
+
+
+@app.websocket("/ws/midi")
+async def websocket_midi_endpoint(
+    websocket: WebSocket,
+) -> None:
+    """Send generated MIDI events based on provided chords."""
+    await websocket.accept()
+    generator = AccompanimentGenerator()
+    ping_task = asyncio.create_task(_heartbeat(websocket))
+    try:
+        await websocket.send_json({"ready": True})
+        while True:
+            data = await websocket.receive_json()
+            chords: Optional[List[str]] = data.get("chords")
+            if not chords:
+                continue
+            accompaniment = generator.generate(chords)
+            for patt in accompaniment:
+                root = patt.split("-")[0]
+                msg = serialize_midi(root)
+                await websocket.send_json(msg)
+    except WebSocketDisconnect:
+        logger.info("websocket midi disconnected")
+    finally:
+        ping_task.cancel()
 
 
 @app.websocket("/ws")
