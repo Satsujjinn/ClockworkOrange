@@ -13,8 +13,8 @@ export interface ChordTimelineProps {
 export const ChordTimeline = ({ events, onMove }: ChordTimelineProps) => {
   const [, drop] = useDrop({ accept: 'CHORD' });
 
-  const Row = ({ index, style }: { index: number; style: CSSProperties }) => {
-    const evt = events[index];
+  const Row = ({ index, style, data }: { index: number; style: CSSProperties; data: ChordEvent[] }) => {
+    const evt = data[index];
     return (
       <ChordBlock
         style={style}
@@ -33,6 +33,7 @@ export const ChordTimeline = ({ events, onMove }: ChordTimelineProps) => {
         width={800}
         itemCount={events.length}
         itemSize={90}
+        itemData={events}
         layout="horizontal"
         overscanCount={5}
         style={{ overflowX: 'auto' }}
