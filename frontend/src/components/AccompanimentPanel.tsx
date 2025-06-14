@@ -1,6 +1,8 @@
 import Grid from '@mui/material/Grid';
 import Slider from '@mui/material/Slider';
 import Typography from '@mui/material/Typography';
+import Tooltip from '@mui/material/Tooltip';
+import Zoom from '@mui/material/Zoom';
 import { useState } from 'react';
 
 interface ControlProps {
@@ -12,7 +14,9 @@ interface ControlProps {
 const Control = ({ label, value, onChange }: ControlProps) => (
   <Grid item xs={12} sm={4}>
     <Typography gutterBottom>{label}</Typography>
-    <Slider value={value} onChange={(_, v) => onChange(v as number)} min={0} max={1} step={0.01} />
+    <Tooltip title={`${label}: ${Math.round(value * 100)}`} TransitionComponent={Zoom} arrow>
+      <Slider value={value} onChange={(_, v) => onChange(v as number)} min={0} max={1} step={0.01} sx={{ transition: 'background-color 0.3s' }} />
+    </Tooltip>
   </Grid>
 );
 

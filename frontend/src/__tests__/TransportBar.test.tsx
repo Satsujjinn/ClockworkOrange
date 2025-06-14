@@ -11,3 +11,11 @@ test('theme toggle switch calls handler', () => {
   fireEvent.click(getByRole('checkbox'));
   expect(handler).toHaveBeenCalled();
 });
+
+test('play button displays tooltip on hover', async () => {
+  const { getByLabelText, findByRole } = render(
+    <TransportBar onPlay={() => {}} onPause={() => {}} onRecord={() => {}} onToggleTheme={() => {}} dark={false} />
+  );
+  fireEvent.mouseOver(getByLabelText('play'));
+  expect(await findByRole('tooltip')).toHaveTextContent('Play (Space)');
+});
