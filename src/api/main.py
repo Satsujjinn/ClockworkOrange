@@ -1,8 +1,10 @@
 import asyncio
-import hashlib
 import logging
 import os
 from typing import Any, AsyncGenerator, Dict, List
+
+from starlette.concurrency import run_in_threadpool
+from prometheus_client import Histogram, generate_latest
 
 import asyncpg
 import structlog
@@ -12,11 +14,20 @@ from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import StreamingResponse, UJSONResponse
 from pydantic import BaseModel
 
-from .audio.utils import load_audio
-from .features.mfcc import extract_mfcc
-from .filter.denoise import denoise
-from .llm.chord_suggester import ChordSuggester
-from .accompaniment.generator import AccompanimentGenerator
+from ..utils.connection import ConnectionManager
+from ..utils.cache import RedisCache
+from ..utils.buffer import AdaptiveBuffer
+
+from ..audio_streaming.utils import load_audio
+from ..feature_extraction.mfcc import extract_mfcc
+from ..filter.denoise import denoise
+from ..llm.chord_suggester import ChordSuggester
+from ..accompaniment.generator import AccompanimentGenerator
+
+REQUEST_LATENCY = Histogram(
+    "request_latency_seconds",
+    "latency of http and websocket requests"
+)
 
 try:
     import aioredis
@@ -25,8 +36,11 @@ except ImportError:  # pragma: no cover - aioredis may not be installed
 
 logger = structlog.get_logger()
 
-app = FastAPI(title="Music AI Service", default_response_class=UJSONResponse)
-app.add_middleware(GZipMiddleware, minimum_size=1000)
+app = FastAPI(
+    title="Music AI Service",
+    default_response_class=UJSONResponse,  # high performance JSON (source 10)
+)
+app.add_middleware(GZipMiddleware, minimum_size=1000)  # source 10
 
 
 class ChordRequest(BaseModel):
@@ -55,6 +69,10 @@ async def startup() -> None:
         except Exception as exc:  # pragma: no cover - Redis optional in tests
             logger.warning("redis connection failed", exc_info=exc)
             app.state.redis = None
+    else:
+        app.state.redis = None
+    app.state.manager = ConnectionManager(app.state.redis)
+    app.state.cache = RedisCache(app.state.redis)
 
 
 @app.on_event("shutdown")
@@ -74,33 +92,35 @@ async def get_redis(request: Request):
     return getattr(request.app.state, "redis", None)
 
 
+async def get_manager(websocket: WebSocket) -> ConnectionManager:
+    return websocket.app.state.manager
+
+
+async def get_cache(request: Request) -> RedisCache:
+    return request.app.state.cache
+
+
 class MusicService:
-    def __init__(self, redis: Any) -> None:
+    def __init__(self, cache: RedisCache) -> None:
         self.suggester = ChordSuggester()
         self.generator = AccompanimentGenerator()
-        self.redis = redis
+        self.cache = cache
 
     async def __call__(self, req: ChordRequest) -> ChordResponse:
         audio_bytes = await load_audio(req.file_path)
-        features = await asyncio.to_thread(extract_mfcc, audio_bytes)
-        features = await asyncio.to_thread(denoise, features)
-        key = "chords:" + hashlib.sha1(str(features).encode()).hexdigest()
-        chords: List[str]
-        if self.redis:
-            cached = await self.redis.get(key)
-            if cached:
-                chords = ujson.loads(cached)
-            else:
-                chords = await asyncio.to_thread(self.suggester.suggest, features)
-                await self.redis.set(key, ujson.dumps(chords))
-        else:
-            chords = await asyncio.to_thread(self.suggester.suggest, features)
-        accompaniment = await asyncio.to_thread(self.generator.generate, chords)
+        # Async pattern using threadpool for CPU-bound work (source 8)
+        features = await run_in_threadpool(extract_mfcc, audio_bytes)
+        features = await run_in_threadpool(denoise, features)
+        chords = await self.cache.get_chords(features)
+        if chords is None:
+            chords = await run_in_threadpool(self.suggester.suggest, features)
+            await self.cache.set_chords(features, chords)
+        accompaniment = await run_in_threadpool(self.generator.generate, chords)
         return ChordResponse(chords=chords, accompaniment=accompaniment)
 
 
-async def get_service(redis=Depends(get_redis)) -> MusicService:
-    return MusicService(redis)
+async def get_service(cache: RedisCache = Depends(get_cache)) -> MusicService:
+    return MusicService(cache)
 
 
 @app.middleware("http")
@@ -108,6 +128,7 @@ async def profiling_middleware(request: Request, call_next):
     start = asyncio.get_event_loop().time()
     response = await call_next(request)
     duration = asyncio.get_event_loop().time() - start
+    REQUEST_LATENCY.observe(duration)
     logger.info("request", path=request.url.path, duration=duration)
     response.headers["X-Process-Time"] = str(duration)
     return response
@@ -116,6 +137,11 @@ async def profiling_middleware(request: Request, call_next):
 @app.get("/healthz")
 async def healthz() -> Dict[str, str]:
     return {"status": "ok"}
+
+
+@app.get("/metrics")
+async def metrics() -> UJSONResponse:
+    return UJSONResponse(content=generate_latest().decode())
 
 
 @app.post("/chords", response_model=ChordResponse)
@@ -130,16 +156,36 @@ async def stream() -> StreamingResponse:
     return StreamingResponse(event_generator(), media_type="text/event-stream")
 
 
+class WSMessage(BaseModel):
+    data: str
+
+
+async def _heartbeat(ws: WebSocket) -> None:
+    while True:
+        await asyncio.sleep(10)
+        await ws.send_json({"type": "ping"})
+
+
 @app.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket) -> None:
-    await websocket.accept()
+async def websocket_endpoint(
+    websocket: WebSocket,
+    manager: ConnectionManager = Depends(get_manager),
+) -> None:
+    await manager.connect(websocket)
+    buffer = AdaptiveBuffer()
+    ping_task = asyncio.create_task(_heartbeat(websocket))
     try:
-        await websocket.send_text("ready")
+        await manager.send_json(websocket, {"ready": True})
         while True:
-            data = await websocket.receive_text()
-            await websocket.send_text(f"echo: {data}")
+            data = await websocket.receive_json()
+            msg = WSMessage(**data)  # validate
+            await buffer.add(msg.data.encode())
+            await manager.send_json(websocket, {"ack": True})
     except WebSocketDisconnect:
         logger.info("websocket disconnected")
+    finally:
+        ping_task.cancel()
+        await manager.disconnect(websocket)
 
 
 if __name__ == "__main__":

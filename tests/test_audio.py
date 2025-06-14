@@ -2,7 +2,7 @@ import asyncio
 
 import pytest
 
-from src.audio.utils import load_audio
+from src.audio_streaming.utils import load_audio
 
 
 @pytest.mark.asyncio

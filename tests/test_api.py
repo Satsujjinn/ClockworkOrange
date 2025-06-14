@@ -4,7 +4,7 @@ sys.path.append(str(pathlib.Path(__file__).resolve().parents[1]))
 
 import pytest
 from fastapi.testclient import TestClient
-from src.main import app
+from src.api.main import app
 
 
 def test_healthz() -> None:

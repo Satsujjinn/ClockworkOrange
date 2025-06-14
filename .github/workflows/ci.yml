@@ -22,9 +22,11 @@ jobs:
       - name: Lint
         run: flake8
       - name: Type check
-        run: mypy webapi
+        run: mypy src
+      - name: Security Scan
+        run: bandit -r src || true
       - name: Test
-        run: pytest
+        run: pytest -vv
       - name: Build Docker
         run: docker build -t music-api:latest .
 

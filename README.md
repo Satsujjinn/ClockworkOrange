@@ -5,12 +5,13 @@ services. It follows [Twelve-Factor](https://12factor.net/) principles and uses
 FastAPI with Ray Serve for scalable inference.
 
 ## Structure
-- `audio` – audio utilities
+- `audio_streaming` – audio utilities & streaming
 - `feature_extraction` – feature engineering
 - `llm` – chord suggestion model
 - `filter` – signal processing
 - `accompaniment` – accompaniment generation
-- `webapi` – FastAPI + Ray Serve web API
+- `api` – FastAPI service
+- `utils` – helpers (cache, connection manager)
 - `deployment` – Docker Compose and Kubernetes examples
 
 ## Development
