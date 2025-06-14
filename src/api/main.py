@@ -22,6 +22,7 @@ from ..audio_streaming.utils import load_audio
 from ..feature_extraction.mfcc import extract_mfcc
 from ..filter.denoise import denoise
 from ..llm.chord_suggester import ChordSuggester
+from ..llm.instruction_generator import InstructionGenerator
 from ..accompaniment.generator import AccompanimentGenerator
 
 REQUEST_LATENCY = Histogram(
@@ -50,6 +51,23 @@ class ChordRequest(BaseModel):
 class ChordResponse(BaseModel):
     chords: List[str]
     accompaniment: List[str]
+
+
+class InstructionRequest(BaseModel):
+    theme: str
+
+
+class InstructionResponse(BaseModel):
+    steps: List[str]
+
+
+class TabRequest(BaseModel):
+    chords: List[str]
+
+
+class TabResponse(BaseModel):
+    guitar: List[str]
+    bass: List[str]
 
 
 @app.on_event("startup")
@@ -147,6 +165,20 @@ async def metrics() -> UJSONResponse:
 @app.post("/chords", response_model=ChordResponse)
 async def suggest_chords(req: ChordRequest, service: MusicService = Depends(get_service)):
     return await service(req)
+
+
+@app.post("/instructions", response_model=InstructionResponse)
+async def songwriting_instructions(req: InstructionRequest) -> InstructionResponse:
+    steps = InstructionGenerator().generate(req.theme)
+    return InstructionResponse(steps=steps)
+
+
+@app.post("/tabs", response_model=TabResponse)
+async def generate_tabs(req: TabRequest) -> TabResponse:
+    from ..llm.tab_generator import TabGenerator
+
+    tabs = TabGenerator().generate(req.chords)
+    return TabResponse(**tabs)
 
 
 @app.get("/stream")

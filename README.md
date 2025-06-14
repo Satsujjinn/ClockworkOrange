@@ -8,6 +8,8 @@ FastAPI with Ray Serve for scalable inference.
 - `audio_streaming` – audio utilities & streaming
 - `feature_extraction` – feature engineering
 - `llm` – chord suggestion model
+- `instructions` – songwriting steps generator
+- `tabs` – guitar and bass tab generation
 - `filter` – signal processing
 - `accompaniment` – accompaniment generation
 - `api` – FastAPI service
@@ -26,6 +28,15 @@ bytes. The server responds with `{"ack": true}` for each chunk and streams back
 chord predictions using messages like `{"chords": ["C", "G", "Am", "F"]}` as soon
 as they become available. A heartbeat message `{"type": "ping"}` is also sent
 periodically.
+
+## Songwriting Instructions
+Musicians without formal theory knowledge can call the `/instructions` endpoint
+with a theme to receive step-by-step guidance for composing a simple song.
+
+## Guitar & Bass Tabs
+Send a list of chords to `/tabs` to receive simple guitar and bass tabs that
+match the progression. This helps players quickly accompany their ideas without
+deep theory knowledge.
 
 ## References
 - MLOps & CI/CD alignment inspired by [Practical MLOps](https://github.com/ai-understanding/practical-mlops)
