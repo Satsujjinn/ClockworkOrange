@@ -16,9 +16,16 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
+      - name: Set up Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
       - name: Install dependencies
         run: |
           python -m pip install -r requirements.txt -r requirements-dev.txt
+          npm ci --prefix frontend
       - name: Lint
         run: flake8
       - name: Type check
@@ -27,6 +34,9 @@ jobs:
         run: bandit -r src || true
       - name: Test
         run: pytest -vv
+      - name: Frontend tests
+        run: npm test
+        working-directory: frontend
       - name: Build Docker
         run: docker build -t music-api:latest .
 
