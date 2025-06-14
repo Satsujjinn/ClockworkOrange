@@ -4,3 +4,8 @@ uvicorn
 pydantic
 python-multipart
 prometheus-client
+structlog
+ujson
+aioredis
+asyncpg
+aiofiles
