@@ -166,6 +166,15 @@ async def _heartbeat(ws: WebSocket) -> None:
         await ws.send_json({"type": "ping"})
 
 
+async def _process_audio(
+    buffer: AdaptiveBuffer, manager: ConnectionManager, ws: WebSocket
+) -> None:
+    suggester = ChordSuggester()
+    async for features in buffer.features():
+        chords = suggester.suggest(features)
+        await manager.send_json(ws, {"chords": chords})
+
+
 @app.websocket("/ws")
 async def websocket_endpoint(
     websocket: WebSocket,
@@ -174,6 +183,7 @@ async def websocket_endpoint(
     await manager.connect(websocket)
     buffer = AdaptiveBuffer()
     ping_task = asyncio.create_task(_heartbeat(websocket))
+    process_task = asyncio.create_task(_process_audio(buffer, manager, websocket))
     try:
         await manager.send_json(websocket, {"ready": True})
         while True:
@@ -185,6 +195,7 @@ async def websocket_endpoint(
         logger.info("websocket disconnected")
     finally:
         ping_task.cancel()
+        process_task.cancel()
         await manager.disconnect(websocket)
 
 
