@@ -1,6 +1,9 @@
 import asyncio
 from collections import deque
-from typing import Deque, Iterable
+from typing import AsyncGenerator, Deque, Iterable, List
+
+from ..feature_extraction.mfcc import extract_mfcc
+from ..filter.denoise import denoise
 
 
 class AdaptiveBuffer:
@@ -23,3 +26,14 @@ class AdaptiveBuffer:
                 self.event.clear()
                 await self.event.wait()
             yield self.queue.popleft()
+
+    async def features(self, min_size: int = 1024) -> AsyncGenerator[List[float], None]:
+        """Yield denoised MFCC features once enough audio has been buffered."""
+        data = b""
+        async for chunk in self.iterate():
+            data += chunk
+            if len(data) >= min_size:
+                feats = extract_mfcc(data)
+                feats = denoise(feats)
+                data = b""
+                yield feats

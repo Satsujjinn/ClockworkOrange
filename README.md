@@ -19,6 +19,14 @@ Use the provided Dockerfile for local development and deployment. The
 `ci.yml` workflow illustrates CI/CD aligned with MLOps best practices. See the
 comments in the workflow and code for references.
 
+## WebSocket Streaming
+The `/ws` endpoint allows streaming audio for realtime chord suggestions.
+Send JSON messages with a `data` field containing raw or base64-encoded audio
+bytes. The server responds with `{"ack": true}` for each chunk and streams back
+chord predictions using messages like `{"chords": ["C", "G", "Am", "F"]}` as soon
+as they become available. A heartbeat message `{"type": "ping"}` is also sent
+periodically.
+
 ## References
 - MLOps & CI/CD alignment inspired by [Practical MLOps](https://github.com/ai-understanding/practical-mlops)
 - Ray Serve with FastAPI for scalable inference: [Ray Serve docs](https://docs.ray.io/en/latest/serve/index.html)
