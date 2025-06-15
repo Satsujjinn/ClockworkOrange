@@ -1,5 +1,4 @@
 fastapi
-ray[serve]
 uvicorn
 pydantic
 python-multipart
