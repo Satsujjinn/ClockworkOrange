@@ -2,7 +2,7 @@
 
 This project demonstrates a minimal, production-ready architecture for music AI
 services. It follows [Twelve-Factor](https://12factor.net/) principles and uses
-FastAPI with Ray Serve for scalable inference.
+FastAPI for scalable inference.
 
 ## Structure
 - `audio_streaming` – audio utilities & streaming
@@ -40,7 +40,6 @@ deep theory knowledge.
 
 ## References
 - MLOps & CI/CD alignment inspired by [Practical MLOps](https://github.com/ai-understanding/practical-mlops)
-- Ray Serve with FastAPI for scalable inference: [Ray Serve docs](https://docs.ray.io/en/latest/serve/index.html)
 - Twelve-Factor app containerization best practices
 - FastAPI deployment workflow: [FastAPI docs on Docker](https://fastapi.tiangolo.com/deployment/docker/)
 - Model monitoring & versioning guidelines: [MLOps with monitoring](https://madewithml.com/courses/mlops/monitoring/)

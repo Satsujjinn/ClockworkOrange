@@ -181,13 +181,6 @@ async def generate_tabs(req: TabRequest) -> TabResponse:
     return TabResponse(**tabs)
 
 
-@app.get("/stream")
-async def stream() -> StreamingResponse:
-    async def event_generator() -> AsyncGenerator[bytes, None]:
-        yield b"data: ready\n\n"
-    return StreamingResponse(event_generator(), media_type="text/event-stream")
-
-
 class WSMessage(BaseModel):
     data: str
 
