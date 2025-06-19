@@ -4,6 +4,7 @@ from src.api.main import app
 
 
 def test_websocket_echo():
+    """Verify the WebSocket echo endpoint replies with chords."""
     with TestClient(app) as client:
         with client.websocket_connect("/ws") as ws:
             ready = ws.receive_json()
