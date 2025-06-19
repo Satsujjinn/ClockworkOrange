@@ -1,6 +1,6 @@
 import asyncio
 from collections import deque
-from typing import AsyncGenerator, Deque, Iterable, List
+from typing import AsyncGenerator, Deque, List
 
 from ..feature_extraction.mfcc import extract_mfcc
 from ..filter.denoise import denoise
@@ -20,7 +20,7 @@ class AdaptiveBuffer:
         self.queue.append(chunk)
         self.event.set()
 
-    async def iterate(self) -> Iterable[bytes]:
+    async def iterate(self) -> AsyncGenerator[bytes, None]:
         while True:
             if not self.queue:
                 self.event.clear()
