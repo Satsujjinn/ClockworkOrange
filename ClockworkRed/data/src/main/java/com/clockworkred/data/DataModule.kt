@@ -5,6 +5,7 @@ import com.clockworkred.domain.AiRepository
 import com.clockworkred.data.remote.AiService
 import com.clockworkred.data.remote.ApiKeyInterceptor
 import com.clockworkred.data.repository.AiRepositoryImpl
+import com.clockworkred.data.BuildConfig
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -14,6 +15,8 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import javax.inject.Singleton
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.flow.first
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -27,11 +30,9 @@ abstract class DataModule {
         @Provides
         @Singleton
         fun provideOkHttpClient(settings: SettingsRepository): OkHttpClient {
+            val apiKey = runBlocking { settings.getApiKey().first() } ?: ""
             return OkHttpClient.Builder()
-                .addInterceptor(ApiKeyInterceptor { 
-                    // TODO read API key from SettingsRepository synchronously
-                    "" 
-                })
+                .addInterceptor(ApiKeyInterceptor { apiKey })
                 .build()
         }
 
@@ -39,8 +40,7 @@ abstract class DataModule {
         @Singleton
         fun provideAiService(client: OkHttpClient): AiService {
             return Retrofit.Builder()
-                // TODO replace with real base URL
-                .baseUrl("https://example.com")
+                .baseUrl(BuildConfig.BASE_URL)
                 .client(client)
                 .addConverterFactory(MoshiConverterFactory.create())
                 .build()
