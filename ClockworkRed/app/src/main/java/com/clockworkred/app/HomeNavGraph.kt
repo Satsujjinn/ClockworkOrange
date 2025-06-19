@@ -8,6 +8,7 @@ import com.clockworkred.app.ui.projects.ProjectsScreen
 import com.clockworkred.app.ui.editor.TabEditorScreen
 import com.clockworkred.app.ui.arrangement.ArrangementCanvasScreen
 import com.clockworkred.app.ui.export.ExportScreen
+import androidx.compose.ui.platform.LocalContext
 import com.clockworkred.app.ui.settings.SettingsScreen
 import com.clockworkred.app.ui.theory.TheoryHelperScreen
 import com.clockworkred.app.editor.TabEditorViewModel
@@ -41,7 +42,14 @@ fun HomeNavGraph(navController: NavHostController) {
         }
         composable("settings") { SettingsScreen() }
         composable("arrangement") { ArrangementCanvasScreen(navController) }
-        composable("export") { ExportScreen() }
+        composable("export") {
+            val activity = LocalContext.current as? MainActivity
+            ExportScreen(
+                onDownloadPdf = { activity?.savePdfWithPermissionCheck() },
+                onSharePdf = { activity?.sharePdfWithPermissionCheck() },
+                onExportMidi = { activity?.exportMidiWithPermissionCheck() }
+            )
+        }
         composable("theory/{topic}") { backStackEntry ->
             val topicName = backStackEntry.arguments?.getString("topic") ?: TheoryTopic.SCALE.name
             val topic = runCatching { TheoryTopic.valueOf(topicName.uppercase()) }.getOrDefault(TheoryTopic.SCALE)
