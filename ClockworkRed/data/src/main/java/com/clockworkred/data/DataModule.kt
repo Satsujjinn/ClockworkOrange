@@ -1,12 +1,10 @@
 package com.clockworkred.data
 
-import com.clockworkred.domain.ProjectRepository
 import com.clockworkred.domain.repository.SettingsRepository
 import com.clockworkred.domain.AiRepository
 import com.clockworkred.data.remote.AiService
 import com.clockworkred.data.remote.ApiKeyInterceptor
 import com.clockworkred.data.repository.AiRepositoryImpl
-import com.clockworkred.data.repository.FakeProjectRepository
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -20,10 +18,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class DataModule {
-
-    @Binds
-    @Singleton
-    abstract fun bindProjectRepository(impl: FakeProjectRepository): ProjectRepository
 
     @Binds
     @Singleton

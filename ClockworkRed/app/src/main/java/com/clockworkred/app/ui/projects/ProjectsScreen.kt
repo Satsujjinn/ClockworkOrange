@@ -4,22 +4,72 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import com.clockworkred.app.projects.ProjectsUiState
 import com.clockworkred.app.projects.ProjectsViewModel
+import androidx.navigation.NavHostController
+import androidx.compose.material3.MaterialTheme
 
 /** Displays list of projects. */
 @Composable
-fun ProjectsScreen(viewModel: ProjectsViewModel = hiltViewModel()) {
+fun ProjectsScreen(
+    navController: NavHostController,
+    viewModel: ProjectsViewModel = hiltViewModel()
+) {
     val uiState by viewModel.uiState.collectAsState()
+    var showDialog by remember { mutableStateOf(false) }
+    var name by remember { mutableStateOf("") }
+
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { if (!uiState.isCreating) showDialog = false },
+            title = { Text("New Project") },
+            text = {
+                Column {
+                    TextField(
+                        value = name,
+                        onValueChange = { name = it },
+                        label = { Text("Project Name") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    uiState.creationError?.let {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(it, color = MaterialTheme.colorScheme.error)
+                    }
+                    if (uiState.isCreating) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        CircularProgressIndicator(modifier = Modifier.size(16.dp))
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { viewModel.createProject(name) }, enabled = !uiState.isCreating) {
+                    Text("Create")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDialog = false }, enabled = !uiState.isCreating) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
+    LaunchedEffect(uiState.isCreating, uiState.projects) {
+        if (showDialog && !uiState.isCreating && uiState.creationError == null) {
+            showDialog = false
+            uiState.projects.lastOrNull()?.let { navController.navigate("editor/${'$'}{it.id}") }
+        }
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         when {
@@ -30,7 +80,7 @@ fun ProjectsScreen(viewModel: ProjectsViewModel = hiltViewModel()) {
                 Column(modifier = Modifier.align(Alignment.Center)) {
                     Text("No projects yet")
                     Spacer(modifier = Modifier.height(8.dp))
-                    Button(onClick = { /* TODO new project */ }) {
+                    Button(onClick = { showDialog = true }) {
                         Text("New Project")
                     }
                 }
