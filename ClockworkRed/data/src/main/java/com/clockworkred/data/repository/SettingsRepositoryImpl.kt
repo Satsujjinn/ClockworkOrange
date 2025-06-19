@@ -4,6 +4,9 @@ import android.content.Context
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.remoteconfig.ktx.remoteConfig
+import kotlinx.coroutines.tasks.await
 import com.clockworkred.data.local.dataStore
 import com.clockworkred.domain.repository.SettingsRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -28,7 +31,8 @@ class SettingsRepositoryImpl @Inject constructor(
     }
 
     override suspend fun fetchRemoteFlags(): Map<String, String> {
-        // TODO integrate Firebase Remote Config
-        return emptyMap()
+        val remoteConfig = Firebase.remoteConfig
+        remoteConfig.fetchAndActivate().await()
+        return remoteConfig.all.mapValues { it.value.asString() }
     }
 }
