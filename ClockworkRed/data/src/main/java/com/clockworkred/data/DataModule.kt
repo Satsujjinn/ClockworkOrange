@@ -1,6 +1,8 @@
 package com.clockworkred.data
 
+import com.clockworkred.domain.ProjectRepository
 import com.clockworkred.domain.SettingsRepository
+import com.clockworkred.data.repository.FakeProjectRepository
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -15,6 +17,10 @@ abstract class DataModule {
     @Binds
     @Singleton
     abstract fun bindSettingsRepository(impl: SettingsRepositoryImpl): SettingsRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindProjectRepository(impl: FakeProjectRepository): ProjectRepository
 
     companion object {
         @Provides
