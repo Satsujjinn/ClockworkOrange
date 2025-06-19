@@ -19,9 +19,14 @@ import com.clockworkred.app.editor.TabEditorViewModel
 import com.clockworkred.domain.model.Instrument
 import com.clockworkred.domain.model.PartRequest
 import com.clockworkred.domain.model.SongSection
+import androidx.navigation.NavHostController
+import com.clockworkred.domain.model.TheoryTopic
 
 @Composable
-fun TabEditorScreen(viewModel: TabEditorViewModel = hiltViewModel()) {
+fun TabEditorScreen(
+    navController: NavHostController,
+    viewModel: TabEditorViewModel = hiltViewModel()
+) {
     val uiState by viewModel.uiState.collectAsState()
 
     val instrument = remember { mutableStateOf(Instrument.GUITAR) }
@@ -115,6 +120,9 @@ fun TabEditorScreen(viewModel: TabEditorViewModel = hiltViewModel()) {
                 uiState.theoryNotes?.let {
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(it)
+                    TextButton(onClick = { navController.navigate("theory/${TheoryTopic.MODE.name.lowercase()}") }) {
+                        Text("Theory Help")
+                    }
                 }
             }
         }
