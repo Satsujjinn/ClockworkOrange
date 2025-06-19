@@ -19,7 +19,7 @@ import androidx.compose.runtime.LaunchedEffect
 @Composable
 fun HomeNavGraph(navController: NavHostController) {
     NavHost(navController = navController, startDestination = "projects") {
-        composable("projects") { ProjectsScreen() }
+        composable("projects") { ProjectsScreen(navController) }
         composable("editor/{instrument}") { backStackEntry ->
             val instrumentName = backStackEntry.arguments?.getString("instrument") ?: "guitar"
             val instrument = runCatching { Instrument.valueOf(instrumentName.uppercase()) }.getOrDefault(Instrument.GUITAR)
