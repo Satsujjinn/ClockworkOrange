@@ -8,6 +8,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import com.clockworkred.domain.model.Instrument
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -33,9 +34,9 @@ fun HomeScreen(navController: NavHostController) {
                     icon = { Text("Projects") }
                 )
                 NavigationBarItem(
-                    selected = currentRoute == "editor",
+                    selected = currentRoute?.startsWith("editor") == true,
                     onClick = {
-                        navController.navigate("editor") {
+                        navController.navigate("editor/${Instrument.GUITAR.name.lowercase()}") {
                             popUpTo(navController.graph.findStartDestination().id) { saveState = true }
                             launchSingleTop = true
                             restoreState = true
