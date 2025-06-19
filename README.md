@@ -13,6 +13,7 @@ FastAPI for scalable inference.
 - `filter` – signal processing
 - `accompaniment` – accompaniment generation
 - `api` – FastAPI service
+- `ClockworkRed` – Android client
 - `utils` – helpers (cache, connection manager)
 - `deployment` – Docker Compose and Kubernetes examples
 
@@ -43,3 +44,5 @@ deep theory knowledge.
 - Twelve-Factor app containerization best practices
 - FastAPI deployment workflow: [FastAPI docs on Docker](https://fastapi.tiangolo.com/deployment/docker/)
 - Model monitoring & versioning guidelines: [MLOps with monitoring](https://madewithml.com/courses/mlops/monitoring/)
+
+For mobile development, see the `ClockworkRed` directory for an Android client built with Kotlin and Jetpack Compose.
