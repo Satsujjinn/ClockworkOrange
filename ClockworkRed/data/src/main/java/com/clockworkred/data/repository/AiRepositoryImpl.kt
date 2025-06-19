@@ -20,7 +20,8 @@ class AiRepositoryImpl @Inject constructor(
             instrument = request.instrument,
             style = request.style,
             references = request.references,
-            section = request.section
+            section = request.section,
+            styleId = request.styleId
         )
         val result = service.generateTab(dto)
         emit(AiTabResult(result.tabText, result.theoryNotes))

@@ -5,5 +5,7 @@ data class PartRequest(
     val instrument: Instrument,
     val style: String,
     val references: List<String>,
-    val section: SongSection
+    val section: SongSection,
+    /** Optional ID referencing a [StyleProfile]. */
+    val styleId: String? = null
 )
