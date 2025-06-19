@@ -6,5 +6,6 @@ prometheus-client
 structlog
 ujson
 aioredis
+redis
 asyncpg
 aiofiles

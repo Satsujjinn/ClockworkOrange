@@ -4,7 +4,7 @@ import os
 from typing import Any, AsyncGenerator, Dict, List
 
 from starlette.concurrency import run_in_threadpool
-from prometheus_client import Histogram, generate_latest
+from prometheus_client import Histogram, generate_latest, CollectorRegistry
 
 import asyncpg
 import structlog
@@ -25,10 +25,6 @@ from ..llm.chord_suggester import ChordSuggester
 from ..llm.instruction_generator import InstructionGenerator
 from ..accompaniment.generator import AccompanimentGenerator
 
-REQUEST_LATENCY = Histogram(
-    "request_latency_seconds",
-    "latency of http and websocket requests"
-)
 
 try:
     import aioredis
@@ -37,11 +33,27 @@ except ImportError:  # pragma: no cover - aioredis may not be installed
 
 logger = structlog.get_logger()
 
-app = FastAPI(
-    title="Music AI Service",
-    default_response_class=UJSONResponse,  # high performance JSON (source 10)
-)
-app.add_middleware(GZipMiddleware, minimum_size=1000)  # source 10
+
+def create_app() -> FastAPI:
+    app = FastAPI(
+        title="Music AI Service",
+        default_response_class=UJSONResponse,  # high performance JSON (source 10)
+    )
+    app.add_middleware(GZipMiddleware, minimum_size=1000)  # source 10
+
+    registry = CollectorRegistry()
+    request_latency = Histogram(
+        "request_latency_seconds",
+        "latency of http and websocket requests",
+        registry=registry,
+    )
+    app.state.registry = registry
+    app.state.request_latency = request_latency
+
+    return app
+
+
+app = create_app()
 
 
 class ChordRequest(BaseModel):
@@ -146,7 +158,7 @@ async def profiling_middleware(request: Request, call_next):
     start = asyncio.get_event_loop().time()
     response = await call_next(request)
     duration = asyncio.get_event_loop().time() - start
-    REQUEST_LATENCY.observe(duration)
+    request.app.state.request_latency.observe(duration)
     logger.info("request", path=request.url.path, duration=duration)
     response.headers["X-Process-Time"] = str(duration)
     return response
@@ -158,8 +170,9 @@ async def healthz() -> Dict[str, str]:
 
 
 @app.get("/metrics")
-async def metrics() -> UJSONResponse:
-    return UJSONResponse(content=generate_latest().decode())
+async def metrics(request: Request) -> UJSONResponse:
+    registry = request.app.state.registry
+    return UJSONResponse(content=generate_latest(registry).decode())
 
 
 @app.post("/chords", response_model=ChordResponse)
