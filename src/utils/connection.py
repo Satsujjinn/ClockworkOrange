@@ -1,5 +1,6 @@
 import asyncio
 from typing import Any, Dict
+from uuid import uuid4
 
 from fastapi import WebSocket
 
@@ -21,14 +22,18 @@ class ConnectionManager:
 
     async def connect(self, websocket: WebSocket) -> None:
         await websocket.accept()
-        self.active[websocket.client[0]] = websocket
+        cid = uuid4().hex
+        websocket.state.connection_id = cid
+        self.active[cid] = websocket
         if self.redis:
-            await self.redis.publish("connect", websocket.client[0])
+            await self.redis.publish("connect", cid)
 
     async def disconnect(self, websocket: WebSocket) -> None:
-        self.active.pop(websocket.client[0], None)
-        if self.redis:
-            await self.redis.publish("disconnect", websocket.client[0])
+        cid = getattr(websocket.state, "connection_id", None)
+        if cid:
+            self.active.pop(cid, None)
+            if self.redis:
+                await self.redis.publish("disconnect", cid)
 
     async def send_json(self, websocket: WebSocket, data: Any) -> None:
         await websocket.send_json(data)
