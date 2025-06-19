@@ -8,7 +8,7 @@ import com.clockworkred.app.ui.projects.ProjectsScreen
 import com.clockworkred.app.ui.editor.TabEditorScreen
 import com.clockworkred.app.ui.arrangement.ArrangementCanvasScreen
 import com.clockworkred.app.ui.export.ExportScreen
-import com.clockworkred.app.SettingsScreen
+import com.clockworkred.app.ui.settings.SettingsScreen
 import com.clockworkred.app.editor.TabEditorViewModel
 import com.clockworkred.domain.model.Instrument
 import com.clockworkred.domain.model.PartRequest
