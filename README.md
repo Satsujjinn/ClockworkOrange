@@ -71,6 +71,10 @@ comments in the workflow and code for references.
    ./gradlew installDebug
    ```
 
+   Network requests use the `BASE_URL` value from
+   `ClockworkRed/data/build.gradle.kts`. Edit this property to point the
+   Android client at your backend service.
+
 ## WebSocket Streaming
 The `/ws` endpoint allows streaming audio for realtime chord suggestions.
 Send JSON messages with a `data` field containing raw or base64-encoded audio

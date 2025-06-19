@@ -12,6 +12,7 @@ android {
     defaultConfig {
         minSdk = 24
         targetSdk = 34
+        buildConfigField("String", "BASE_URL", "\"https://api.clockworkred.com/\"")
     }
 }
 
