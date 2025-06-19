@@ -30,6 +30,11 @@ fun TabEditorScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
+    val styleOptions by viewModel.styleOptions.collectAsState(emptyList())
+    val selectedStyleId by viewModel.selectedStyleId.collectAsState()
+    val selectedStyle = styleOptions.firstOrNull { it.id == selectedStyleId }
+    var styleMenuExpanded by remember { mutableStateOf(false) }
+
     val instrument = remember { mutableStateOf(Instrument.GUITAR) }
     val instrumentExpanded = remember { mutableStateOf(false) }
     val style = remember { mutableStateOf(prefillStyle) }
@@ -38,6 +43,37 @@ fun TabEditorScreen(
     val sectionExpanded = remember { mutableStateOf(false) }
 
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+        // Style profile dropdown
+        // TODO Add searchable dropdown when style list grows
+        ExposedDropdownMenuBox(
+            expanded = styleMenuExpanded,
+            onExpandedChange = { styleMenuExpanded = !styleMenuExpanded }
+        ) {
+            TextField(
+                value = selectedStyle?.name ?: "Select Style",
+                onValueChange = {},
+                readOnly = true,
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(styleMenuExpanded) },
+                modifier = Modifier.menuAnchor().fillMaxWidth()
+            )
+            ExposedDropdownMenu(
+                expanded = styleMenuExpanded,
+                onDismissRequest = { styleMenuExpanded = false }
+            ) {
+                styleOptions.forEach { style ->
+                    DropdownMenuItem(
+                        text = { Text(style.name) },
+                        onClick = {
+                            viewModel.onStyleSelected(style.id)
+                            styleMenuExpanded = false
+                        }
+                    )
+                }
+            }
+        }
+        selectedStyle?.let { Text(it.name) }
+        Spacer(modifier = Modifier.height(8.dp))
+
         // Instrument dropdown
         ExposedDropdownMenuBox(expanded = instrumentExpanded.value, onExpandedChange = { instrumentExpanded.value = !instrumentExpanded.value }) {
             OutlinedTextField(
@@ -103,7 +139,8 @@ fun TabEditorScreen(
                     instrument.value,
                     style.value,
                     references.value.split(',').map { it.trim() }.filter { it.isNotEmpty() },
-                    section.value
+                    section.value,
+                    viewModel.selectedStyleId.value
                 )
             )
         }) {
