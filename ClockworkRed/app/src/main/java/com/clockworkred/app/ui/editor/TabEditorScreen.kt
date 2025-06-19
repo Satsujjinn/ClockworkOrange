@@ -25,13 +25,14 @@ import com.clockworkred.domain.model.TheoryTopic
 @Composable
 fun TabEditorScreen(
     navController: NavHostController,
-    viewModel: TabEditorViewModel = hiltViewModel()
+    viewModel: TabEditorViewModel = hiltViewModel(),
+    prefillStyle: String = ""
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
     val instrument = remember { mutableStateOf(Instrument.GUITAR) }
     val instrumentExpanded = remember { mutableStateOf(false) }
-    val style = remember { mutableStateOf("") }
+    val style = remember { mutableStateOf(prefillStyle) }
     val references = remember { mutableStateOf("") }
     val section = remember { mutableStateOf(SongSection.CHORUS) }
     val sectionExpanded = remember { mutableStateOf(false) }
