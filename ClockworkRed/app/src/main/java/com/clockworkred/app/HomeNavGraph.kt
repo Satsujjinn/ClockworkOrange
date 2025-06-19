@@ -17,19 +17,27 @@ import com.clockworkred.domain.model.SongSection
 import com.clockworkred.domain.model.TheoryTopic
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.runtime.LaunchedEffect
+import com.clockworkred.app.ui.styles.StyleDetailScreen
+import com.clockworkred.app.ui.styles.StyleListScreen
 
 @Composable
 fun HomeNavGraph(navController: NavHostController) {
     NavHost(navController = navController, startDestination = "projects") {
         composable("projects") { ProjectsScreen(navController) }
-        composable("editor/{instrument}") { backStackEntry ->
+        composable("editor/{instrument}?style={style}") { backStackEntry ->
             val instrumentName = backStackEntry.arguments?.getString("instrument") ?: "guitar"
+            val style = backStackEntry.arguments?.getString("style") ?: ""
             val instrument = runCatching { Instrument.valueOf(instrumentName.uppercase()) }.getOrDefault(Instrument.GUITAR)
             val viewModel: TabEditorViewModel = hiltViewModel()
-            LaunchedEffect(instrument) {
-                viewModel.requestTab(PartRequest(instrument, "", emptyList(), SongSection.CHORUS))
+            LaunchedEffect(instrument, style) {
+                viewModel.requestTab(PartRequest(instrument, style, emptyList(), SongSection.CHORUS))
             }
-            TabEditorScreen(navController, viewModel)
+            TabEditorScreen(navController, viewModel, prefillStyle = style)
+        }
+        composable("styles") { StyleListScreen(navController) }
+        composable("style/{id}") { backStackEntry ->
+            val id = backStackEntry.arguments?.getString("id") ?: ""
+            StyleDetailScreen(navController, styleId = id)
         }
         composable("settings") { SettingsScreen() }
         composable("arrangement") { ArrangementCanvasScreen(navController) }
