@@ -9,4 +9,7 @@ interface SettingsRepository {
 
     /** Saves the provided API key. */
     suspend fun saveApiKey(key: String)
+
+    /** Fetches feature flags from remote config service. */
+    suspend fun fetchRemoteFlags(): Map<String, String>
 }

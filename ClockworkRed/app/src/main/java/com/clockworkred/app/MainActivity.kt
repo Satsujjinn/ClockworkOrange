@@ -7,8 +7,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
+import permissions.dispatcher.NeedsPermission
+import permissions.dispatcher.RuntimePermissions
 
 @AndroidEntryPoint
+@RuntimePermissions
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -20,5 +23,11 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    /** Example permission gated call. */
+    @NeedsPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE)
+    fun exportFiles() {
+        // TODO implement export logic
     }
 }
