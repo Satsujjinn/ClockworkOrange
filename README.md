@@ -22,6 +22,55 @@ Use the provided Dockerfile for local development and deployment. The
 `ci.yml` workflow illustrates CI/CD aligned with MLOps best practices. See the
 comments in the workflow and code for references.
 
+## Setup
+
+1. Create and activate a Python 3.11 virtual environment:
+
+   ```bash
+   python -m venv venv
+   source venv/bin/activate
+   ```
+
+2. Install backend requirements:
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+   Development and test tools can be installed with:
+
+   ```bash
+   pip install -r requirements-dev.txt
+   ```
+
+3. Start the API service:
+
+   ```bash
+   uvicorn src.api.main:app --reload
+   ```
+
+   Or run with Docker:
+
+   ```bash
+   docker build -t music-api .
+   docker run -p 8000:8000 music-api
+   ```
+
+4. Launch the React frontend:
+
+   ```bash
+   cd frontend
+   npm install
+   npm run dev
+   ```
+
+5. Install the Android client on a device or emulator:
+
+   ```bash
+   cd ClockworkRed
+   ./gradlew installDebug
+   ```
+
 ## WebSocket Streaming
 The `/ws` endpoint allows streaming audio for realtime chord suggestions.
 Send JSON messages with a `data` field containing raw or base64-encoded audio
@@ -46,3 +95,46 @@ deep theory knowledge.
 - Model monitoring & versioning guidelines: [MLOps with monitoring](https://madewithml.com/courses/mlops/monitoring/)
 
 For mobile development, see the `ClockworkRed` directory for an Android client built with Kotlin and Jetpack Compose.
+
+## Release
+
+1. Run the full test suite to ensure the code is stable:
+
+   ```bash
+   pytest -vv
+   ```
+
+2. Build and push the API Docker image:
+
+   ```bash
+   docker build -t your-registry/music-api:latest .
+   docker push your-registry/music-api:latest
+   ```
+
+   Deploy locally with Docker Compose:
+
+   ```bash
+   docker compose -f deployment/docker-compose.yml up
+   ```
+
+   Or deploy to Kubernetes:
+
+   ```bash
+   kubectl apply -f deployment/k8s/deployment.yaml
+   ```
+
+3. Generate a production build of the frontend:
+
+   ```bash
+   cd frontend
+   npm install
+   npm run build
+   ```
+
+4. Build the Android release APK:
+
+   ```bash
+   cd ClockworkRed
+   ./gradlew assembleRelease
+   ```
+   The APK will be in `app/build/outputs/apk/release`.
