@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ClockworkRed</string>
+    <string name="new_project">New Project</string>
+    <string name="project_name">Project Name</string>
+    <string name="create">Create</string>
+    <string name="cancel">Cancel</string>
+    <string name="no_projects">No projects yet</string>
+    <string name="download_pdf">Download PDF</string>
+    <string name="share_pdf">Share PDF</string>
+    <string name="export_midi">Export MIDI</string>
+</resources>

@@ -26,4 +26,9 @@ class SettingsRepositoryImpl @Inject constructor(
     override suspend fun saveApiKey(key: String) {
         context.dataStore.edit { it[API_KEY] = key }
     }
+
+    override suspend fun fetchRemoteFlags(): Map<String, String> {
+        // TODO integrate Firebase Remote Config
+        return emptyMap()
+    }
 }

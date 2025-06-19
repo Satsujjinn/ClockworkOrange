@@ -14,10 +14,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
+import androidx.compose.ui.res.stringResource
 import com.clockworkred.app.projects.ProjectsUiState
 import com.clockworkred.app.projects.ProjectsViewModel
 import androidx.navigation.NavHostController
 import androidx.compose.material3.MaterialTheme
+import com.clockworkred.app.R
 
 /** Displays list of projects. */
 @Composable
@@ -32,13 +34,13 @@ fun ProjectsScreen(
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { if (!uiState.isCreating) showDialog = false },
-            title = { Text("New Project") },
+            title = { Text(stringResource(id = R.string.new_project)) },
             text = {
                 Column {
                     TextField(
                         value = name,
                         onValueChange = { name = it },
-                        label = { Text("Project Name") },
+                        label = { Text(stringResource(id = R.string.project_name)) },
                         modifier = Modifier.fillMaxWidth()
                     )
                     uiState.creationError?.let {
@@ -53,12 +55,12 @@ fun ProjectsScreen(
             },
             confirmButton = {
                 TextButton(onClick = { viewModel.createProject(name) }, enabled = !uiState.isCreating) {
-                    Text("Create")
+                    Text(stringResource(id = R.string.create))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDialog = false }, enabled = !uiState.isCreating) {
-                    Text("Cancel")
+                    Text(stringResource(id = R.string.cancel))
                 }
             }
         )
@@ -78,10 +80,10 @@ fun ProjectsScreen(
             }
             uiState.projects.isEmpty() -> {
                 Column(modifier = Modifier.align(Alignment.Center)) {
-                    Text("No projects yet")
+                    Text(stringResource(id = R.string.no_projects))
                     Spacer(modifier = Modifier.height(8.dp))
                     Button(onClick = { showDialog = true }) {
-                        Text("New Project")
+                        Text(stringResource(id = R.string.new_project))
                     }
                 }
             }

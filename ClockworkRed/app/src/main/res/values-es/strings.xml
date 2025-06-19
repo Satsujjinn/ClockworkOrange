@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ClockworkRojo</string>
+    <string name="new_project">Nuevo Proyecto</string>
+    <string name="project_name">Nombre del Proyecto</string>
+    <string name="create">Crear</string>
+    <string name="cancel">Cancelar</string>
+    <string name="no_projects">Aún no hay proyectos</string>
+    <string name="download_pdf">Descargar PDF</string>
+    <string name="share_pdf">Compartir PDF</string>
+    <string name="export_midi">Exportar MIDI</string>
+</resources>
