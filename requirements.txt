@@ -5,7 +5,6 @@ python-multipart
 prometheus-client
 structlog
 ujson
-aioredis
-redis
+redis>=4
 asyncpg
 aiofiles

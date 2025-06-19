@@ -4,9 +4,9 @@ from typing import Any, Dict
 from fastapi import WebSocket
 
 try:
-    import aioredis
+    from redis import asyncio as redis
 except Exception:  # pragma: no cover - optional redis
-    aioredis = None  # type: ignore
+    redis = None  # type: ignore
 
 
 class ConnectionManager:

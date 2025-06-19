@@ -3,9 +3,9 @@ import ujson
 from typing import Any, Optional
 
 try:
-    import aioredis
+    from redis import asyncio as redis
 except Exception:  # pragma: no cover - optional redis
-    aioredis = None  # type: ignore
+    redis = None  # type: ignore
 
 
 class RedisCache:
