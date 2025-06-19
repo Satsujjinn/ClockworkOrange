@@ -3,9 +3,11 @@ package com.clockworkred.app
 import com.clockworkred.data.repository.FakeArrangementRepository
 import com.clockworkred.data.repository.FakeProjectRepository
 import com.clockworkred.data.repository.SettingsRepositoryImpl
+import com.clockworkred.data.repository.TheoryRepositoryImpl
 import com.clockworkred.domain.ArrangementRepository
 import com.clockworkred.domain.ProjectRepository
 import com.clockworkred.domain.repository.SettingsRepository
+import com.clockworkred.domain.repository.TheoryRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -27,4 +29,8 @@ abstract class AppModule {
     @Binds
     @Singleton
     abstract fun bindSettingsRepository(impl: SettingsRepositoryImpl): SettingsRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindTheoryRepository(impl: TheoryRepositoryImpl): TheoryRepository
 }

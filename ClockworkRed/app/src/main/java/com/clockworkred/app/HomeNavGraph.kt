@@ -9,10 +9,12 @@ import com.clockworkred.app.ui.editor.TabEditorScreen
 import com.clockworkred.app.ui.arrangement.ArrangementCanvasScreen
 import com.clockworkred.app.ui.export.ExportScreen
 import com.clockworkred.app.ui.settings.SettingsScreen
+import com.clockworkred.app.ui.theory.TheoryHelperScreen
 import com.clockworkred.app.editor.TabEditorViewModel
 import com.clockworkred.domain.model.Instrument
 import com.clockworkred.domain.model.PartRequest
 import com.clockworkred.domain.model.SongSection
+import com.clockworkred.domain.model.TheoryTopic
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.runtime.LaunchedEffect
 
@@ -27,10 +29,15 @@ fun HomeNavGraph(navController: NavHostController) {
             LaunchedEffect(instrument) {
                 viewModel.requestTab(PartRequest(instrument, "", emptyList(), SongSection.CHORUS))
             }
-            TabEditorScreen(viewModel)
+            TabEditorScreen(navController, viewModel)
         }
         composable("settings") { SettingsScreen() }
         composable("arrangement") { ArrangementCanvasScreen(navController) }
         composable("export") { ExportScreen() }
+        composable("theory/{topic}") { backStackEntry ->
+            val topicName = backStackEntry.arguments?.getString("topic") ?: TheoryTopic.SCALE.name
+            val topic = runCatching { TheoryTopic.valueOf(topicName.uppercase()) }.getOrDefault(TheoryTopic.SCALE)
+            TheoryHelperScreen(topic = topic)
+        }
     }
 }
