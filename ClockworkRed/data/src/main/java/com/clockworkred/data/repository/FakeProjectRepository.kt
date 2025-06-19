@@ -12,19 +12,20 @@ import javax.inject.Singleton
 /** Simple in-memory repository returning fake data. */
 @Singleton
 class FakeProjectRepository @Inject constructor() : ProjectRepository {
+    private val projects = mutableListOf(
+        ProjectEntity("1", "Alpha", System.currentTimeMillis()),
+        ProjectEntity("2", "Beta", System.currentTimeMillis()),
+        ProjectEntity("3", "Gamma", System.currentTimeMillis())
+    )
+
     override fun getAllProjects(): Flow<List<ProjectModel>> = flow {
         delay(500)
-        val projects = listOf(
-            ProjectEntity("1", "Alpha", System.currentTimeMillis()),
-            ProjectEntity("2", "Beta", System.currentTimeMillis()),
-            ProjectEntity("3", "Gamma", System.currentTimeMillis())
-        ).map { ProjectModel(it.id, it.name, it.createdAt) }
-        emit(projects)
+        emit(projects.map { ProjectModel(it.id, it.name, it.createdAt) })
     }
 
     override suspend fun createProject(name: String): ProjectModel {
-        // TODO persist the project when real data layer is implemented
         val entity = ProjectEntity(UUID.randomUUID().toString(), name, System.currentTimeMillis())
+        projects += entity
         return ProjectModel(entity.id, entity.name, entity.createdAt)
     }
 }
