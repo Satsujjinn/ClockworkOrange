@@ -1,0 +1,5 @@
+# Kotlin/Android build outputs
+**/build/
+**/local.properties
+/.gradle/
+**/__pycache__/
