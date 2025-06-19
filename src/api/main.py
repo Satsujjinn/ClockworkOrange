@@ -27,9 +27,9 @@ from ..accompaniment.generator import AccompanimentGenerator
 
 
 try:
-    import aioredis
-except ImportError:  # pragma: no cover - aioredis may not be installed
-    aioredis = None  # type: ignore
+    from redis import asyncio as redis
+except ImportError:  # pragma: no cover - redis may not be installed
+    redis = None  # type: ignore
 
 logger = structlog.get_logger()
 
@@ -91,11 +91,12 @@ async def startup() -> None:
     except Exception as exc:  # pragma: no cover - DB optional in tests
         logger.warning("db connection failed", exc_info=exc)
         app.state.db_pool = None
-    if aioredis:
+    if redis:
         try:
-            app.state.redis = aioredis.from_url(
+            app.state.redis = redis.from_url(
                 os.getenv("REDIS_URL", "redis://localhost"), decode_responses=True
             )
+            await app.state.redis.ping()
         except Exception as exc:  # pragma: no cover - Redis optional in tests
             logger.warning("redis connection failed", exc_info=exc)
             app.state.redis = None
@@ -109,7 +110,7 @@ async def startup() -> None:
 async def shutdown() -> None:
     if app.state.db_pool:
         await app.state.db_pool.close()
-    if aioredis and getattr(app.state, "redis", None):
+    if redis and getattr(app.state, "redis", None):
         await app.state.redis.close()
         await app.state.redis.connection_pool.disconnect()
 
