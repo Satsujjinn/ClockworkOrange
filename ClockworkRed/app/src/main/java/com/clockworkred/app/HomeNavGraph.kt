@@ -6,6 +6,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.clockworkred.app.ui.projects.ProjectsScreen
 import com.clockworkred.app.ui.editor.TabEditorScreen
+import com.clockworkred.app.ui.arrangement.ArrangementCanvasScreen
+import com.clockworkred.app.ui.export.ExportScreen
 import com.clockworkred.app.SettingsScreen
 import com.clockworkred.app.editor.TabEditorViewModel
 import com.clockworkred.domain.model.Instrument
@@ -28,5 +30,7 @@ fun HomeNavGraph(navController: NavHostController) {
             TabEditorScreen(viewModel)
         }
         composable("settings") { SettingsScreen() }
+        composable("arrangement") { ArrangementCanvasScreen(navController) }
+        composable("export") { ExportScreen() }
     }
 }
